@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "skills": {
+    "avoid-ai-design": {
+      "source": "funboy322/avoid-ai-design",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "5f0ad5b9e3192854cc0c6f8a49edd65d00008a942dded2f0f46dd5a2b6ad0d03"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "83485963700bcf11d5bf78118facb301676b69d918fee2e45a95e7f1a2840f6c"
+    },
+    "nuxt": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "skillPath": "skills/nuxt/SKILL.md",
+      "computedHash": "4c10d4e793c1d7f4308a3b66930d55d6531224ea887ae29d9bcc946cea2c8081"
+    },
+    "vue": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "skillPath": "skills/vue/SKILL.md",
+      "computedHash": "973126c2d026d971177def462808c99b65965b3f88e6769282aa300c214af66f"
+    },
+    "vue-best-practices": {
+      "source": "vuejs-ai/skills",
+      "sourceType": "github",
+      "skillPath": "skills/vue-best-practices/SKILL.md",
+      "computedHash": "2b4ee45c8b9d77d99896c510ca1c0ecb56914b7bdda84dcbd872f3941d3b9f54"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
+      "computedHash": "4f68ae07187fb0d1fb78c88b503d089da4cf5a9d9625d1f2e425b1590bf96d92"
+    }
+  }
+}

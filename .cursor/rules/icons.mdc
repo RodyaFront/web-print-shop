@@ -1,0 +1,26 @@
+---
+description: Иконки - только Phosphor через Nuxt Icon
+alwaysApply: true
+---
+
+# Иконки
+
+Единственный набор: **Phosphor** (`ph:`). Подключение: `@nuxt/icon` + `@iconify-json/ph`.
+
+## Использование
+
+```vue
+<Icon name="ph:paint-brush" class="icon" aria-hidden="true" />
+```
+
+- Имена только с префиксом `ph:` (например `ph:truck`, `ph:upload-simple`).
+- Для active/выбранного состояния допустим вес `*-fill` из той же семьи (`ph:truck-fill`).
+- Размер через класс `.icon` / `.icon-sm` / `.icon-lg` из `main.css`, не произвольный `font-size` вразброс.
+- Декоративные иконки рядом с текстом: `aria-hidden="true"`. Если иконка одна несёт смысл кнопки - дать `aria-label` на кнопке.
+
+## Не делать
+
+- Не подключать Lucide, Heroicons, Tabler и другие наборы как основной UI.
+- Не ставить одинаковые иконки в ряд из трёх карточек "фича-грид".
+- Не вешать стрелку `ph:arrow-right` на каждую CTA.
+- Не смешивать outline и fill без причины (fill - для активного/нажатого или статуса).

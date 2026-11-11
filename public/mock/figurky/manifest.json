@@ -1,0 +1,10 @@
+{
+  "description": "Mock product images for /figurky catalog cards. Transparent PNG after rembg cutout. Catalog fields live in shared/figurky-catalog.ts.",
+  "items": [
+    { "id": "mock-01", "image": "/mock/figurky/01.png", "title": "Рей Аянамі" },
+    { "id": "mock-02", "image": "/mock/figurky/02.png", "title": "Лейла" },
+    { "id": "mock-03", "image": "/mock/figurky/03.png", "title": "Кецін" },
+    { "id": "mock-04", "image": "/mock/figurky/04.png", "title": "Фрірен" },
+    { "id": "mock-05", "image": "/mock/figurky/05.png", "title": "Кяру" }
+  ]
+}

@@ -1,0 +1,56 @@
+---
+description: Интерактив - hover, active, tap и аналоговый эффект нажатия
+alwaysApply: true
+---
+
+# Интерактивные элементы
+
+Любой кликабельный элемент обязан иметь явные состояния **hover**, **active** и **tap** (на практике tap = `:active` + корректный touch). Стиль: небольшое продавливание, как у физической кнопки.
+
+## Обязательный набор состояний
+
+| Состояние | Когда | Поведение |
+| --- | --- | --- |
+| default | покой | Есть объём: лёгкая "губа" снизу (`box-shadow`) или видимая граница |
+| hover | курсор над элементом | Только при `(hover: hover) and (pointer: fine)`. Чуть приподнять (`translateY` вверх на `--press-raise`) и усилить губу |
+| active / tap | mousedown / touch | Продавить вниз (`translateY` на `--press-depth`) + inset-тень; губа снизу исчезает |
+| focus-visible | клавиатура | Отдельный outline (уже глобальный). Не заменять press-эффектом |
+| disabled | недоступен | Без hover/active/press. `cursor: not-allowed`, пониженная opacity |
+
+Без `:hover` / `:active` (или эквивалента) новый кликабельный UI не принимать.
+
+## Куда применять
+
+1. **Кнопки и CTA-ссылки** (`.btn`, submit) - полный press.
+2. **Навигация** (`.nav a`) - мягкий press (меньше ход).
+3. **Лого / `.brand`** - исключение: без press, без подчёркивания и «губы». Только `focus-visible` для клавиатуры.
+4. **Текстовые ссылки** в контенте и футере - цвет + лёгкий press.
+5. **Поля форм** (`input`, `select`, `textarea`, file) - на `:active` / `:focus` заметное углубление границы (inset), не прыжок всей страницы.
+6. **Чекбокс-лейбл** (`.checkbox`) - press на всю кликабельную область.
+7. Кастомные кликабельные блоки - тот же контракт; не оставлять "мёртвый" клик без feedback.
+
+## Токены и реализация
+
+В `app/assets/css/main.css`:
+
+- `--press-raise`, `--press-depth`, `--press-shadow`, `--press-inset`, `--press-lip-paint*`
+- Общие правила на `.btn`, `.nav a`, `a`, controls (не `.brand`)
+- Hover-lift только внутри `@media (hover: hover) and (pointer: fine)` **и** `html:not([data-pointer='touch'])`
+- Плагин `app/plugins/pointer-modality.client.ts` ставит `data-pointer` по `pointerType`, чтобы на гібридах (тач + трекпад) hover не залипал після тапу
+- Колір hover ≠ колір active (primary/secondary особливо)
+- Поля форм: inset лише на `:active`; `:focus` - border/ring без вічного press
+- При `prefers-reduced-motion: reduce` - без transform; оставить смену цвета / тени
+- `touch-action: manipulation` на клікабельних controls
+
+## Запрещено
+
+- Кликабельный элемент только со сменой `cursor: pointer` и без hover/active
+- Hover, который выглядит как active (путаница состояний)
+- Сильный bounce, elastic, glow, scale > ~2% - это не аналоговая кнопка
+- Убирать focus-visible ради "красивого" press
+
+## Проверка
+
+Мышь: default → hover (чуть вверх) → active (вниз, вдавлено) → отпускание.  
+Тач: tap сразу даёт вдавливание, без залипшего hover.  
+Клавиатура: Tab показывает outline; Enter/Space дают active.
