@@ -76,7 +76,7 @@ function formatDate(value: string) {
               <div>{{ order.name }}</div>
               <div class="muted">{{ order.phone }}</div>
             </td>
-            <td>{{ order.city }}</td>
+            <td>{{ order.city || '—' }}</td>
             <td>
               <NuxtLink class="icon-gap" :to="`/admin/orders/${order.id}`">
                 <Icon name="ph:arrow-square-out" class="icon-sm" aria-hidden="true" />

@@ -37,6 +37,10 @@ export default defineNuxtConfig({
     meestLogin: '',
     meestPassword: '',
     ukrposhtaBearer: '',
+    public: {
+      /** Production origin for canonical, sitemap, JSON-LD. Example: https://figulyarnya.ua */
+      siteUrl: '',
+    },
   },
   nitro: {
     // STL and reference packs for custom orders

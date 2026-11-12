@@ -44,6 +44,9 @@ watch(count, (value) => {
 
 const form = reactive({
   name: '',
+  telegram: '',
+  viber: '',
+  whatsapp: '',
 })
 
 const phoneLocal = ref('')
@@ -119,6 +122,9 @@ async function onSubmit(event: Event) {
     body.set('type', 'ready')
     body.set('name', form.name)
     body.set('phone', phone)
+    body.set('telegram', form.telegram.trim())
+    body.set('viber', form.viber.trim())
+    body.set('whatsapp', form.whatsapp.trim())
     body.set('comment', '')
     body.set('productIds', JSON.stringify(ids.value))
     body.set('deliveryMethod', deliveryMethod.value)
@@ -148,6 +154,9 @@ async function onSubmit(event: Event) {
     clear()
     successId.value = result.id
     form.name = ''
+    form.telegram = ''
+    form.viber = ''
+    form.whatsapp = ''
     phoneLocal.value = ''
     deliveryCity.value = null
     deliveryMethod.value = null
@@ -231,6 +240,51 @@ async function onSubmit(event: Event) {
               <p id="checkout-phone-hint" class="visually-hidden">
                 Код країни +380 уже вказаний. Введіть наступні 9 цифр.
               </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="stack" aria-labelledby="checkout-messenger-title">
+          <div class="section-title">
+            <h2 id="checkout-messenger-title">Спосіб зв’язку</h2>
+          </div>
+          <p class="hint">За бажанням - щоб зручніше зв’язатись у месенджері.</p>
+          <div class="form-grid two">
+            <div class="field">
+              <label for="checkout-telegram">Telegram</label>
+              <input
+                id="checkout-telegram"
+                v-model="form.telegram"
+                name="telegram"
+                type="text"
+                autocomplete="off"
+                maxlength="64"
+                placeholder="@username або номер"
+              >
+            </div>
+            <div class="field">
+              <label for="checkout-viber">Viber</label>
+              <input
+                id="checkout-viber"
+                v-model="form.viber"
+                name="viber"
+                type="text"
+                autocomplete="off"
+                maxlength="64"
+                placeholder="Номер або ім’я"
+              >
+            </div>
+            <div class="field">
+              <label for="checkout-whatsapp">WhatsApp</label>
+              <input
+                id="checkout-whatsapp"
+                v-model="form.whatsapp"
+                name="whatsapp"
+                type="text"
+                autocomplete="off"
+                maxlength="64"
+                placeholder="Номер"
+              >
             </div>
           </div>
         </section>

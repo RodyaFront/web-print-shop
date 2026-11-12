@@ -16,7 +16,7 @@ const { has, add } = useCart()
 const available = computed(() => props.product.status === 'in_stock')
 const inCart = computed(() => has(props.product.id))
 const metaLine = computed(() => figurineMetaLine(props.product))
-const href = computed(() => figurinePath(props.product.id))
+const href = computed(() => figurinePath(props.product))
 
 function addToCart() {
   add(props.product.id)

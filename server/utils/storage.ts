@@ -31,6 +31,9 @@ export type OrderRecord = {
   updatedAt: string
   name: string
   phone: string
+  telegram: string
+  viber: string
+  whatsapp: string
   city: string
   deliveryAddress: string
   description: string
@@ -170,6 +173,9 @@ function normalizeOrder(raw: Record<string, unknown>): OrderRecord {
     deliveryCityRef: String(raw.deliveryCityRef ?? ''),
     deliveryPointId: String(raw.deliveryPointId ?? ''),
     deliveryPointLabel: String(raw.deliveryPointLabel ?? ''),
+    telegram: String(raw.telegram ?? ''),
+    viber: String(raw.viber ?? ''),
+    whatsapp: String(raw.whatsapp ?? ''),
     paymentMethod: raw.paymentMethod === 'card' ? 'card' : 'cod',
     isAdultContent: Boolean(raw.isAdultContent) || legacyAdult,
     characterAdultConfirmed:
@@ -185,6 +191,9 @@ type CreateOrderInput = {
   type: OrderType
   name: string
   phone: string
+  telegram?: string
+  viber?: string
+  whatsapp?: string
   city: string
   deliveryAddress: string
   description: string
@@ -268,6 +277,9 @@ export async function createOrder(input: CreateOrderInput): Promise<OrderRecord>
     updatedAt: now,
     name: input.name,
     phone: input.phone,
+    telegram: String(input.telegram ?? '').trim(),
+    viber: String(input.viber ?? '').trim(),
+    whatsapp: String(input.whatsapp ?? '').trim(),
     city: input.city,
     deliveryAddress: input.deliveryAddress,
     description: input.description,

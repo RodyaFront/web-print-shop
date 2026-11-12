@@ -59,7 +59,7 @@ const countLabel = computed(() => {
           </div>
           <div class="cart-line__info stack-tight">
             <h2 class="cart-line__title">
-              <NuxtLink class="cart-line__title-link" :to="figurinePath(product.id)">
+              <NuxtLink class="cart-line__title-link" :to="figurinePath(product)">
                 {{ product.title }}
               </NuxtLink>
             </h2>

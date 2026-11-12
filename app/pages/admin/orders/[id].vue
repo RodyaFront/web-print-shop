@@ -32,6 +32,9 @@ type OrderDetail = {
   updatedAt: string
   name: string
   phone: string
+  telegram?: string
+  viber?: string
+  whatsapp?: string
   city: string
   deliveryAddress: string
   description: string
@@ -147,7 +150,10 @@ async function saveStatus() {
         <h2>Клієнт</h2>
         <p><strong>{{ data.name }}</strong></p>
         <p>Телефон: {{ data.phone }}</p>
-        <p>Місто: {{ data.city }}</p>
+        <p v-if="data.telegram">Telegram: {{ data.telegram }}</p>
+        <p v-if="data.viber">Viber: {{ data.viber }}</p>
+        <p v-if="data.whatsapp">WhatsApp: {{ data.whatsapp }}</p>
+        <p v-if="data.city">Місто: {{ data.city }}</p>
         <template v-if="data.deliveryMethod">
           <p>
             Спосіб:
@@ -157,8 +163,10 @@ async function saveStatus() {
             Пункт: {{ data.deliveryPointLabel }}
           </p>
         </template>
-        <p v-else>Доставка: {{ data.deliveryAddress }}</p>
-        <p>
+        <p v-else-if="data.deliveryAddress">
+          Доставка: {{ data.deliveryAddress }}
+        </p>
+        <p v-if="data.type === 'ready'">
           Оплата:
           {{ PAYMENT_METHOD_LABELS[data.paymentMethod === 'card' ? 'card' : 'cod'] }}
         </p>
@@ -182,7 +190,7 @@ async function saveStatus() {
           <p><strong>Опис:</strong> {{ data.description }}</p>
         </template>
         <p v-if="data.comment"><strong>Коментар:</strong> {{ data.comment }}</p>
-        <p v-if="data.type === 'figurine' || data.type === 'ready'">
+        <p v-if="data.type === 'ready'">
           Фарбування: входить у послугу
         </p>
         <p v-else-if="data.needsPainting !== null">

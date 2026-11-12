@@ -1,15 +1,91 @@
 <script setup lang="ts">
-import { FIGURKY_CATALOG } from '../../../shared/figurky-catalog'
+import { FIGURKY_CATALOG, figurinePath } from '../../../shared/figurky-catalog'
 
 const { shopName } = useShop()
-
-useSeoMeta({
-  title: `Фігурки під ключ - ${shopName}`,
-  description:
-    'Готові фігурки з ручним фарбуванням і замовлення під ключ за вашими референсами.',
-})
+const siteOrigin = useSiteOrigin()
 
 const catalog = FIGURKY_CATALOG
+const catalogUrl = computed(() => `${siteOrigin.value}/figurky`)
+
+const productGridRef = ref<HTMLElement | null>(null)
+const gridColumnCount = ref(1)
+
+const fillerCount = computed(() => {
+  const cols = gridColumnCount.value
+  if (cols <= 1) return 0
+  const rem = catalog.length % cols
+  return rem === 0 ? 0 : cols - rem
+})
+
+function readGridColumns(el: HTMLElement) {
+  const template = getComputedStyle(el).gridTemplateColumns
+  if (!template || template === 'none') {
+    gridColumnCount.value = 1
+    return
+  }
+  gridColumnCount.value = template.split(/\s+/).filter(Boolean).length
+}
+
+let gridObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  const el = productGridRef.value
+  if (!el || typeof ResizeObserver === 'undefined') return
+  readGridColumns(el)
+  gridObserver = new ResizeObserver(() => {
+    readGridColumns(el)
+  })
+  gridObserver.observe(el)
+})
+
+onBeforeUnmount(() => {
+  gridObserver?.disconnect()
+  gridObserver = null
+})
+
+useSeoMeta({
+  title: `Купити аніме фігурки - ручне фарбування | ${shopName}`,
+  description:
+    'Купити готові аніме фігурки в Україні. Ручне фарбування, доставка поштою. Також фігурка під ваш запит.',
+  ogTitle: `Купити аніме фігурки | ${shopName}`,
+  ogDescription:
+    'Готові аніме фігурки з ручним фарбуванням. Доставка по Україні. Замовлення під ключ за референсами.',
+  ogType: 'website',
+})
+
+useHead(() => {
+  const itemList = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Купити аніме фігурки',
+    description:
+      'Готові аніме фігурки з ручним фарбуванням і замовлення під ключ.',
+    url: catalogUrl.value,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: catalog.map((product, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: `${siteOrigin.value}${figurinePath(product)}`,
+        name: `Фігурка ${product.title}`,
+        image: product.image.startsWith('http')
+          ? product.image
+          : `${siteOrigin.value}${product.image}`,
+      })),
+    },
+  }
+
+  return {
+    link: [{ rel: 'canonical', href: catalogUrl.value }],
+    script: [
+      {
+        type: 'application/ld+json',
+        children: JSON.stringify(itemList),
+      },
+    ],
+  }
+})
+
 
 /** Subtle parallax range for the figurine track (px). */
 const FIG_PARALLAX_PX = 14
@@ -127,9 +203,10 @@ onBeforeUnmount(() => {
       <div class="custom-banner__copy">
         <h2 id="custom-banner-title">Фігурка під ваш запит</h2>
         <p>
-          Надішліть референси або модель. Надрукуємо, поґрунтуємо й розфарбуємо
-          вручну. Ціну назвемо після перегляду.
+          Надішліть референси або модель - надрукуємо й за потреби розфарбуємо
+          вручну. Ціну назвемо після перегляду
         </p>
+        <p>Також приймаємо запити 18+</p>
         <NuxtLink class="btn custom-banner__cta" to="/figurky/zamovyty">
           Замовити
           <Icon name="ph:arrow-right" class="icon" aria-hidden="true" />
@@ -152,17 +229,42 @@ onBeforeUnmount(() => {
 
     <section class="figurky-catalog" aria-labelledby="figurky-catalog-title">
       <div class="section-title">
-        <h1 id="figurky-catalog-title">Готові фігурки</h1>
+        <h1 id="figurky-catalog-title">Купити аніме фігурки</h1>
         <p class="lede">
-          Позиції зі складу: надруковані й розфарбовані вручну.
+          Готові позиції зі складу: надруковані й розфарбовані вручну.
         </p>
       </div>
 
-      <ul class="product-grid">
+      <ul ref="productGridRef" class="product-grid">
         <li v-for="product in catalog" :key="product.id">
           <FigurineCard :product="product" />
         </li>
+        <li
+          v-for="n in fillerCount"
+          :key="`filler-${n}`"
+          class="product-grid__filler"
+          aria-hidden="true"
+        >
+          <div class="figurine-card-placeholder">
+            <span class="figurine-card-placeholder__label">Пусто</span>
+          </div>
+        </li>
       </ul>
+
+      <div class="figurky-seo stack">
+        <h2 class="figurky-seo__title">Аніме фігурки з ручним фарбуванням</h2>
+        <p>
+          У каталозі Фігулярні зібрані готові аніме фігурки для покупки в Україні.
+          Кожну позицію друкуємо й фарбуємо вручну. Оплата накладеним платежем
+          або на картку, доставка поштою.
+        </p>
+        <p>
+          Немає потрібного персонажа в каталозі - можна
+          <NuxtLink to="/figurky/zamovyty">замовити фігурку під ключ</NuxtLink>
+          за своїми референсами або моделлю.
+        </p>
+      </div>
     </section>
   </div>
 </template>
+

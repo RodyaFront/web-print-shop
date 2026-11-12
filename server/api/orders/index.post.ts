@@ -67,6 +67,9 @@ export default defineEventHandler(async (event) => {
 
   const name = asText(fields.get('name'))
   const phoneRaw = asText(fields.get('phone'))
+  const telegram = asText(fields.get('telegram')).slice(0, 64)
+  const viber = asText(fields.get('viber')).slice(0, 64)
+  const whatsapp = asText(fields.get('whatsapp')).slice(0, 64)
   const size = asText(fields.get('size'))
   const comment = asText(fields.get('comment'))
 
@@ -86,7 +89,11 @@ export default defineEventHandler(async (event) => {
   let city = asText(fields.get('city'))
   let deliveryAddress = asText(fields.get('deliveryAddress'))
 
-  if (deliveryMethodRaw || deliveryCityLabel || deliveryPointId) {
+  const hasDeliveryPayload = Boolean(
+    deliveryMethodRaw || deliveryCityLabel || deliveryPointId,
+  )
+
+  if (type === 'ready' || hasDeliveryPayload) {
     if (!isDeliveryMethod(deliveryMethodRaw)) {
       throw createError({ statusCode: 400, message: 'Оберіть спосіб доставки' })
     }
@@ -104,10 +111,17 @@ export default defineEventHandler(async (event) => {
     deliveryAddress = `${deliveryMethodLabel(deliveryMethod)}: ${deliveryPointLabel}`
   }
 
-  if (!name || !phoneRaw || !city || !deliveryAddress) {
+  if (!name || !phoneRaw) {
     throw createError({
       statusCode: 400,
-      message: 'Заповніть ім’я, телефон, місто та доставку',
+      message: 'Заповніть ім’я та телефон',
+    })
+  }
+
+  if (type === 'ready' && (!city || !deliveryAddress)) {
+    throw createError({
+      statusCode: 400,
+      message: 'Оберіть місто та відділення доставки',
     })
   }
 
@@ -153,14 +167,14 @@ export default defineEventHandler(async (event) => {
   } else if (!description) {
     throw createError({
       statusCode: 400,
-      message: 'Заповніть ім’я, телефон, місто, доставку та опис роботи',
+      message: 'Опишіть роботу',
     })
   }
 
   let needsPainting: boolean | null = null
-  if (type === 'parts') {
+  if (type === 'parts' || type === 'figurine') {
     needsPainting = asBool(fields.get('needsPainting'))
-  } else if (type === 'figurine' || type === 'ready') {
+  } else if (type === 'ready') {
     needsPainting = true
   }
 
@@ -190,6 +204,9 @@ export default defineEventHandler(async (event) => {
     type,
     name,
     phone,
+    telegram,
+    viber,
+    whatsapp,
     city,
     deliveryAddress,
     description,

@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import type { DeliveryCity, DeliveryMethod, DeliveryPoint } from '../../shared/delivery'
-import { deliveryCarrierOf, deliveryMethodLabel } from '../../shared/delivery'
-import type { OrderType, PaymentMethod } from '../../shared/shop'
+import type { OrderType } from '../../shared/shop'
 import {
   ALLOWED_UPLOAD_EXTENSIONS,
   MAX_FILES_PER_ORDER,
@@ -26,21 +24,17 @@ const submitting = ref(false)
 const error = ref('')
 const successId = ref('')
 const successOpen = ref(false)
-const commentOpen = ref(false)
 
 const form = reactive({
   name: '',
   description: '',
-  comment: '',
+  telegram: '',
+  viber: '',
+  whatsapp: '',
   needsPainting: false,
   isAdultContent: false,
   characterAdultConfirmed: false,
 })
-
-const deliveryCity = ref<DeliveryCity | null>(null)
-const deliveryMethod = ref<DeliveryMethod | null>(null)
-const deliveryPoint = ref<DeliveryPoint | null>(null)
-const paymentMethod = ref<PaymentMethod>('cod')
 
 /** 9 digits after +380 (no fake placeholder number). */
 const phoneLocal = ref('')
@@ -70,16 +64,16 @@ const title = computed(() => {
 
 const intro = computed(() => {
   if (props.type === 'figurine') {
-    return 'Друк і ручне фарбування художником. Ціну і строк узгоджуємо після перегляду моделі та референсів.'
+    return 'Друк фігурки. Ручне фарбування можна додати окремо. Ціну і строк узгоджуємо після перегляду моделі та референсів.'
   }
-  return 'Друк окремих деталей. Фарбування можна додати окремо. Ціну назвемо після перегляду файлів.'
+  return 'Надішліть STL або OBJ. Опишіть задачу (прототип, корпус, дрібна геометрія) і матеріал за бажанням. Ціну й строк назвемо після перегляду моделі.'
 })
 
 const descriptionPlaceholder = computed(() => {
   if (props.type === 'figurine') {
     return 'Персонаж, поза, деталі, матеріал…'
   }
-  return 'Що друкуємо, кількість, матеріал, допуски…'
+  return 'Тип задачі, кількість, матеріал, допуски…'
 })
 
 watch(
@@ -101,14 +95,6 @@ function openFilePicker() {
 function clearFiles() {
   if (fileInput.value) fileInput.value.value = ''
   selectedFiles.value = []
-}
-
-function openComment() {
-  commentOpen.value = true
-}
-
-function collapseComment() {
-  commentOpen.value = false
 }
 
 function onPhoneLocalInput(event: Event) {
@@ -171,9 +157,6 @@ async function onSubmit(event: Event) {
     if (!isValidUaMobileLocal(phoneLocal.value)) {
       throw new Error('Вкажіть 9 цифр номера після +380')
     }
-    if (!deliveryCity.value || !deliveryMethod.value || !deliveryPoint.value) {
-      throw new Error('Оберіть місто, спосіб доставки та відділення')
-    }
 
     const files = fileInput.value?.files
     if (files && files.length > MAX_FILES_PER_ORDER) {
@@ -186,28 +169,13 @@ async function onSubmit(event: Event) {
     body.set('type', props.type)
     body.set('name', form.name)
     body.set('phone', phone)
-    body.set(
-      'city',
-      deliveryCity.value.area
-        ? `${deliveryCity.value.label}, ${deliveryCity.value.area}`
-        : deliveryCity.value.label,
-    )
-    body.set(
-      'deliveryAddress',
-      `${deliveryMethodLabel(deliveryMethod.value)}: ${deliveryPoint.value.label}`,
-    )
-    body.set('deliveryMethod', deliveryMethod.value)
-    body.set('deliveryCarrier', deliveryCarrierOf(deliveryMethod.value))
-    body.set('deliveryCityLabel', deliveryCity.value.label)
-    body.set('deliveryCityArea', deliveryCity.value.area)
-    body.set('deliveryCityRef', deliveryCity.value.npCityRef)
-    body.set('deliveryPointId', deliveryPoint.value.id)
-    body.set('deliveryPointLabel', deliveryPoint.value.label)
-    body.set('paymentMethod', paymentMethod.value)
+    body.set('telegram', form.telegram.trim())
+    body.set('viber', form.viber.trim())
+    body.set('whatsapp', form.whatsapp.trim())
     body.set('description', form.description)
-    body.set('comment', commentOpen.value ? form.comment : '')
+    body.set('comment', '')
 
-    if (props.type === 'parts') {
+    if (props.type === 'parts' || props.type === 'figurine') {
       body.set('needsPainting', form.needsPainting ? 'true' : 'false')
     }
     if (props.type === 'figurine') {
@@ -234,16 +202,13 @@ async function onSubmit(event: Event) {
     successId.value = result.id
     form.name = ''
     phoneLocal.value = ''
+    form.telegram = ''
+    form.viber = ''
+    form.whatsapp = ''
     form.description = ''
-    form.comment = ''
     form.needsPainting = false
     form.isAdultContent = false
     form.characterAdultConfirmed = false
-    commentOpen.value = false
-    deliveryCity.value = null
-    deliveryMethod.value = null
-    deliveryPoint.value = null
-    paymentMethod.value = 'cod'
     clearFiles()
     successOpen.value = true
   } catch (err: unknown) {
@@ -305,6 +270,13 @@ async function onSubmit(event: Event) {
 
       <template v-if="type === 'figurine'">
         <label class="checkbox">
+          <input v-model="form.needsPainting" type="checkbox">
+          <span class="icon-gap">
+            <Icon name="ph:paint-brush" class="icon-sm" aria-hidden="true" />
+            Потрібне ручне фарбування
+          </span>
+        </label>
+        <label class="checkbox">
           <input v-model="form.isAdultContent" type="checkbox">
           <span>Замовлення 18+ (дорослий контент фігурки)</span>
         </label>
@@ -364,11 +336,6 @@ async function onSubmit(event: Event) {
         </div>
       </div>
 
-      <div v-if="type === 'figurine'" class="muted icon-gap">
-        <Icon name="ph:paint-brush" class="icon-sm" aria-hidden="true" />
-        Фарбування художником входить у цю послугу.
-      </div>
-
       <label v-if="type === 'parts'" class="checkbox">
         <input v-model="form.needsPainting" type="checkbox">
         <span class="icon-gap">
@@ -376,27 +343,6 @@ async function onSubmit(event: Event) {
           Потрібне ручне фарбування деталей
         </span>
       </label>
-
-      <div v-if="!commentOpen">
-        <button class="btn btn-ghost" type="button" @click="openComment">
-          <Icon name="ph:chat-text" class="icon-sm" aria-hidden="true" />
-          Додати коментар
-        </button>
-      </div>
-      <div v-else class="field">
-        <div class="field-label-row">
-          <label for="comment">Коментар</label>
-          <button
-            class="btn-icon btn-icon--dense"
-            type="button"
-            aria-label="Сховати коментар"
-            @click="collapseComment"
-          >
-            <Icon name="ph:x" class="icon-sm" aria-hidden="true" />
-          </button>
-        </div>
-        <textarea id="comment" v-model="form.comment" name="comment" />
-      </div>
     </section>
 
     <section class="stack" aria-labelledby="order-contact-title">
@@ -435,23 +381,56 @@ async function onSubmit(event: Event) {
       </div>
     </section>
 
-    <DeliveryFields
-      v-model:city="deliveryCity"
-      v-model:method="deliveryMethod"
-      v-model:point="deliveryPoint"
-    />
-
-    <PaymentFields v-model="paymentMethod" />
+    <section class="stack" aria-labelledby="order-messenger-title">
+      <div class="section-title">
+        <h2 id="order-messenger-title">Спосіб зв’язку</h2>
+      </div>
+      <p class="hint">За бажанням - щоб зручніше зв’язатись у месенджері.</p>
+      <div class="form-grid two">
+        <div class="field">
+          <label for="telegram">Telegram</label>
+          <input
+            id="telegram"
+            v-model="form.telegram"
+            name="telegram"
+            type="text"
+            autocomplete="off"
+            maxlength="64"
+            placeholder="@username або номер"
+          >
+        </div>
+        <div class="field">
+          <label for="viber">Viber</label>
+          <input
+            id="viber"
+            v-model="form.viber"
+            name="viber"
+            type="text"
+            autocomplete="off"
+            maxlength="64"
+            placeholder="Номер або ім’я"
+          >
+        </div>
+        <div class="field">
+          <label for="whatsapp">WhatsApp</label>
+          <input
+            id="whatsapp"
+            v-model="form.whatsapp"
+            name="whatsapp"
+            type="text"
+            autocomplete="off"
+            maxlength="64"
+            placeholder="Номер"
+          >
+        </div>
+      </div>
+    </section>
 
     <div class="row">
       <button class="btn btn-primary" type="submit" :disabled="submitting">
         <Icon name="ph:paper-plane-tilt" class="icon-sm" aria-hidden="true" />
         {{ submitting ? 'Надсилаємо…' : 'Надіслати заявку' }}
       </button>
-      <NuxtLink class="btn btn-ghost" to="/delivery">
-        <Icon name="ph:truck" class="icon-sm" aria-hidden="true" />
-        Умови доставки
-      </NuxtLink>
     </div>
     </form>
 
