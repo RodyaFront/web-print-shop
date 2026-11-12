@@ -4,8 +4,8 @@ import { PARTS_ACCEPTED_FILES } from '../../../shared/print-services'
 const { shopName } = useShop()
 
 useSeoMeta({
-  title: `Замовити 3D-друк деталей - ${shopName}`,
-  description: `Заявка на 3D-друк деталей в Одесі. Надішліть ${PARTS_ACCEPTED_FILES} - ціну й строк назвемо після перегляду моделі.`,
+  title: `Замовити деталі - ${shopName}`,
+  description: `Заявка на деталі в Одесі. Надішліть ${PARTS_ACCEPTED_FILES} - ціну й строк назвемо після перегляду файлу.`,
 })
 </script>
 

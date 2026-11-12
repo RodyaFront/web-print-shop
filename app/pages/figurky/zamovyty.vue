@@ -2,7 +2,9 @@
 const { shopName } = useShop()
 
 useSeoMeta({
-  title: `Замовити фігурку під ключ - ${shopName}`,
+  title: `Замовити фігурку - ${shopName}`,
+  description:
+    'Заявка на фігурку. Надішліть STL або OBJ - за потреби розфарбуємо вручну.',
 })
 </script>
 

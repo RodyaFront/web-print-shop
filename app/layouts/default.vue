@@ -1,3 +1,7 @@
+<script setup lang="ts">
+useShopLine()
+</script>
+
 <template>
   <div>
     <AppHeader />

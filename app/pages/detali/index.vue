@@ -18,7 +18,7 @@ const minOrderLabel = formatPartsMinOrder()
 const priceFrom = technologies[0]?.priceFrom || ''
 const primaryTech = technologies[0]
 const printArea =
-  primaryTech?.capabilities.find((item) => item.label === 'Максимальний розмір')
+  primaryTech?.capabilities.find((item) => item.id === 'build-volume')
     ?.value || ''
 const heroStats = partsStatsBanner({
   printArea,
@@ -53,11 +53,6 @@ useSeoMeta({
             Технічні деталі й прототипи за вашою моделлю.
           </p>
         </div>
-        <div class="detali-hero__actions row">
-          <NuxtLink class="btn btn-secondary" to="/detali/zamovyty">
-            Замовити друк
-          </NuxtLink>
-        </div>
       </div>
     </header>
 
@@ -74,9 +69,14 @@ useSeoMeta({
             <dd>{{ stat.value }}</dd>
           </div>
         </dl>
-        <a class="btn detali-stats__cta" href="#ceny">
-          Ціни
-        </a>
+        <div class="detali-stats__actions">
+          <a class="btn detali-stats__cta detali-stats__cta--secondary" href="#ceny">
+            Ціни
+          </a>
+          <NuxtLink class="btn detali-stats__cta" to="/detali/zamovyty">
+            Замовити деталі
+          </NuxtLink>
+        </div>
       </div>
     </aside>
 
@@ -126,12 +126,15 @@ useSeoMeta({
       <dl class="detali-specs">
         <div
           v-for="item in primaryTech.capabilities"
-          :key="item.label"
+          :key="item.id"
           class="detali-specs__item"
         >
-          <dt>{{ item.label }}</dt>
-          <dd>{{ item.value }}</dd>
-          <p v-if="item.hint" class="muted">{{ item.hint }}</p>
+          <DetaliLimitVisual :id="item.id" />
+          <div class="detali-specs__copy">
+            <dt>{{ item.label }}</dt>
+            <dd>{{ item.value }}</dd>
+            <p v-if="item.hint" class="muted">{{ item.hint }}</p>
+          </div>
         </div>
       </dl>
     </section>
@@ -253,7 +256,7 @@ useSeoMeta({
 
     <div class="row">
       <NuxtLink class="btn btn-primary" to="/detali/zamovyty">
-        Надіслати модель
+        Замовити деталі
         <Icon name="ph:upload-simple" class="icon" aria-hidden="true" />
       </NuxtLink>
     </div>

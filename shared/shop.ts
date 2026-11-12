@@ -8,8 +8,8 @@ export const ORDER_STATUSES = ['new', 'in_progress', 'done'] as const
 export type OrderStatus = (typeof ORDER_STATUSES)[number]
 
 export const ORDER_TYPE_LABELS: Record<OrderType, string> = {
-  figurine: 'Фігурка під ключ',
-  parts: 'Друк деталей',
+  figurine: 'Фігурка',
+  parts: 'Деталі',
   ready: 'Готові фігурки',
 }
 

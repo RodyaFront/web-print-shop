@@ -54,6 +54,7 @@ margin-block-start: var(--space-6);
 ## Исключения (осознанно)
 
 - **Hairline:** `1px` / `0.125rem` для бордеров и measure-линии - не spacing-токен.
+- **Радиус:** не через `--space-*` и не произвольный `px` - правило `radius.mdc`.
 - **Оптика контролов:** микросдвиг чекбокса (`margin-top: 0.2rem`) допустим как локальный optical fix; не размножать.
 - **`margin: auto`** для центрирования / `margin-inline: auto` у `.shell` - ок.
 - **`min-height` кнопок** (`2.75rem`) - размер цели касания, не spacing; не подменять gap.

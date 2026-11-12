@@ -44,12 +44,18 @@ const feedbackRef = ref<HTMLElement | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const selectedFiles = ref<File[]>([])
 
-const accept = ALLOWED_UPLOAD_EXTENSIONS.join(',')
+const FIGURINE_PRINT_EXTENSIONS = ['.stl', '.obj', '.zip'] as const
+
+const accept = computed(() =>
+  props.type === 'figurine'
+    ? FIGURINE_PRINT_EXTENSIONS.join(',')
+    : ALLOWED_UPLOAD_EXTENSIONS.join(','),
+)
 const maxMb = Math.round(MAX_UPLOAD_BYTES / (1024 * 1024))
 
 const lineLabel = computed(() => {
-  if (props.type === 'figurine') return 'Фігурка під ключ'
-  return 'Друк деталей'
+  if (props.type === 'figurine') return 'Фігурка'
+  return 'Деталі'
 })
 
 const lineIcon = computed(() => {
@@ -58,22 +64,44 @@ const lineIcon = computed(() => {
 })
 
 const title = computed(() => {
-  if (props.type === 'figurine') return 'Замовити фігурку під ключ'
-  return 'Замовити друк деталей'
+  if (props.type === 'figurine') return 'Замовити фігурку'
+  return 'Замовити деталі'
 })
 
 const intro = computed(() => {
   if (props.type === 'figurine') {
-    return 'Друк фігурки. Ручне фарбування можна додати окремо. Ціну і строк узгоджуємо після перегляду моделі та референсів.'
+    return 'Надішліть файл для друку. За потреби додамо ручне фарбування. Ціну й строк назвемо після перегляду файлу.'
   }
-  return 'Надішліть STL або OBJ. Опишіть задачу (прототип, корпус, дрібна геометрія) і матеріал за бажанням. Ціну й строк назвемо після перегляду моделі.'
+  return 'Надішліть STL або OBJ. Опишіть задачу (прототип, корпус, дрібна геометрія) і матеріал за бажанням. Ціну й строк назвемо після перегляду файлу.'
 })
 
 const descriptionPlaceholder = computed(() => {
   if (props.type === 'figurine') {
-    return 'Персонаж, поза, деталі, матеріал…'
+    return 'Персонаж, масштаб, побажання до фарбування…'
   }
   return 'Тип задачі, кількість, матеріал, допуски…'
+})
+
+const filesLabel = computed(() => {
+  if (props.type === 'figurine') return 'Файли для друку'
+  return 'Файли моделі'
+})
+
+const filesHint = computed(() => {
+  if (props.type === 'figurine') {
+    return `Формати: ${FIGURINE_PRINT_EXTENSIONS.join(', ')}. До ${MAX_FILES_PER_ORDER} файлів, кожен до ${maxMb} МБ.`
+  }
+  return `До ${MAX_FILES_PER_ORDER} файлів, кожен до ${maxMb} МБ. Формати: ${ALLOWED_UPLOAD_EXTENSIONS.join(', ')}.`
+})
+
+const submitLabel = computed(() => {
+  if (props.type === 'parts') return 'Розрахувати вартість'
+  return 'Надіслати заявку'
+})
+
+const submittingLabel = computed(() => {
+  if (props.type === 'parts') return 'Рахуємо…'
+  return 'Надсилаємо…'
 })
 
 watch(
@@ -292,7 +320,7 @@ async function onSubmit(event: Event) {
       <div class="field">
         <span class="field-label icon-gap" id="files-label">
           <Icon name="ph:upload-simple" class="icon-sm" aria-hidden="true" />
-          Референси та файли
+          {{ filesLabel }}
         </span>
         <div class="file-upload">
           <input
@@ -330,8 +358,7 @@ async function onSubmit(event: Event) {
             </li>
           </ul>
           <p class="hint">
-            До {{ MAX_FILES_PER_ORDER }} файлів, кожен до {{ maxMb }} МБ.
-            Формати: {{ ALLOWED_UPLOAD_EXTENSIONS.join(', ') }}.
+            {{ filesHint }}
           </p>
         </div>
       </div>
@@ -429,7 +456,7 @@ async function onSubmit(event: Event) {
     <div class="row">
       <button class="btn btn-primary" type="submit" :disabled="submitting">
         <Icon name="ph:paper-plane-tilt" class="icon-sm" aria-hidden="true" />
-        {{ submitting ? 'Надсилаємо…' : 'Надіслати заявку' }}
+        {{ submitting ? submittingLabel : submitLabel }}
       </button>
     </div>
     </form>

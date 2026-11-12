@@ -106,7 +106,7 @@ onBeforeUnmount(() => {
             aria-label="Тип замовлення"
           >
             <NuxtLink
-              class="header-order__item"
+              class="header-order__item header-order__item--parts"
               role="menuitem"
               to="/detali/zamovyty"
               @click="closeOrderMenu"
@@ -115,13 +115,13 @@ onBeforeUnmount(() => {
               <span>Замовити деталі</span>
             </NuxtLink>
             <NuxtLink
-              class="header-order__item"
+              class="header-order__item header-order__item--figurine"
               role="menuitem"
               to="/figurky/zamovyty"
               @click="closeOrderMenu"
             >
               <Icon name="ph:paint-brush" class="icon" aria-hidden="true" />
-              <span>Замовити фігурки</span>
+              <span>Замовити фігурку</span>
             </NuxtLink>
           </div>
         </div>

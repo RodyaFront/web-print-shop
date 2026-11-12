@@ -15,8 +15,18 @@ export type PrintPriceRow = {
   prices: Record<string, string>
 }
 
+export const PRINT_LIMIT_IDS = [
+  'build-volume',
+  'wall',
+  'feature',
+  'layer',
+] as const
+
+export type PrintLimitId = (typeof PRINT_LIMIT_IDS)[number]
+
 /** Limits a buyer needs before sending a model. */
 export type PrintCapability = {
+  id: PrintLimitId
   label: string
   value: string
   hint?: string
@@ -172,20 +182,24 @@ export const PRINT_TECHNOLOGIES: PrintTechnology[] = [
       'Гладка поверхня й дрібні елементи. Корпуси, кріплення, майстер-моделі, складна форма.',
     capabilities: [
       {
+        id: 'build-volume',
         label: 'Максимальний розмір',
         value: 'до 212 × 118 × 220 мм',
       },
       {
+        id: 'wall',
         label: 'Мін. товщина стінок',
         value: 'орієнтир від 0,6 мм',
         hint: 'Для надійного друку. Тонші місця узгоджуємо по файлу.',
       },
       {
+        id: 'feature',
         label: 'Дрібні елементи',
         value: 'орієнтир від ~0,4 мм',
         hint: 'При шарі 50 мкм. Тонший шар дає чіткіші грані.',
       },
       {
+        id: 'layer',
         label: 'Товщина шару',
         value: '25-100 мкм',
         hint: '50 мкм - зазвичай оптимальний баланс швидкості й якості.',

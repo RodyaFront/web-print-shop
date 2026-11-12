@@ -47,7 +47,9 @@ useSeoMeta({
     product.value
       ? `${product.value.seoTitle} | ${shopName}`
       : `Фігурка | ${shopName}`,
-  description: () => product.value?.seoDescription || 'Готова фігурка з ручним фарбуванням.',
+  description: () =>
+    product.value?.seoDescription
+    || 'Аніме фігурка з друком і ручним фарбуванням.',
   ogTitle: () =>
     product.value
       ? `${product.value.seoTitle} | ${shopName}`
@@ -179,6 +181,9 @@ function addToCart() {
         </header>
 
         <p class="product-page__price">{{ formatPriceUah(product.priceUah) }}</p>
+        <p v-if="product.painted" class="product-page__paint">
+          Друк і ручне фарбування
+        </p>
 
         <div class="product-page__actions row">
           <button
