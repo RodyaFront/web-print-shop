@@ -3074,36 +3074,48 @@ a.figurine-card__media:active {
   }
 }
 
-.detali-points {
+.detali-materials {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0;
+  gap: var(--space-4);
+  grid-template-columns: 1fr;
 }
 
-.detali-points li {
+.detali-materials__item {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  min-width: 0;
+  padding: var(--space-4);
+  border: var(--hairline) solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+}
+
+.detali-materials__copy {
   display: grid;
   gap: var(--space-1);
-  padding-block: var(--space-4);
-  border-bottom: var(--hairline) solid var(--line);
-  max-width: var(--measure);
+  min-width: 0;
 }
 
-.detali-points li:first-child {
-  border-top: var(--hairline) solid var(--line);
-}
-
-.detali-points strong {
-  display: block;
+.detali-materials__copy strong {
   font-size: var(--text-ui);
   line-height: var(--leading-ui);
   font-weight: 600;
 }
 
-.detali-points p {
-  margin-block: 0;
-  max-width: var(--measure);
+.detali-materials__copy p {
+  margin: 0;
+  font-size: var(--text-caption);
+  line-height: var(--leading-ui);
+}
+
+@media (min-width: 40rem) {
+  .detali-materials {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .detali-steps {
@@ -3155,8 +3167,56 @@ a.figurine-card__media:active {
 .detali-printer__name,
 .detali-prices__tech {
   margin: 0;
+  font-family: var(--font-display);
   font-size: var(--text-h3);
   line-height: var(--leading-h3);
+  font-weight: 600;
+  letter-spacing: var(--tracking-display);
+}
+
+.detali-prices__min {
+  margin: 0;
+  font-size: var(--text-ui);
+  line-height: var(--leading-ui);
+  font-weight: 600;
+  color: var(--filament);
+}
+
+.detali-prices__panel {
+  border: var(--hairline) solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  -webkit-overflow-scrolling: touch;
+}
+
+.detali-price-table {
+  background: transparent;
+}
+
+.detali-price-table th,
+.detali-price-table td {
+  padding: var(--space-3) var(--space-4);
+}
+
+.detali-price-table thead th {
+  font-size: var(--text-caption);
+  line-height: var(--leading-ui);
+  font-weight: 600;
+  color: var(--ink-muted);
+  background: color-mix(in srgb, var(--detali) 6%, var(--surface-raised));
+}
+
+.detali-price-table tbody td {
+  font-size: var(--text-ui);
+  line-height: var(--leading-ui);
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.detali-price-table tbody tr:last-child th,
+.detali-price-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .detali-specs {
@@ -3205,7 +3265,7 @@ a.figurine-card__media:active {
   line-height: var(--leading-ui);
 }
 
-.detali-limit-visual {
+.detali-card-visual {
   display: grid;
   place-items: center;
   width: 100%;
@@ -3214,25 +3274,25 @@ a.figurine-card__media:active {
   background: color-mix(in srgb, var(--detali) 8%, var(--surface));
 }
 
-.detali-limit-visual__svg {
+.detali-card-visual__svg {
   width: min(100%, 9.375rem);
   height: auto;
 }
 
-.detali-limit-visual__muted {
+.detali-card-visual__muted {
   stroke: var(--line);
 }
 
-.detali-limit-visual__accent {
+.detali-card-visual__accent {
   stroke: var(--detali);
 }
 
-.detali-limit-visual__fill {
+.detali-card-visual__fill {
   fill: color-mix(in srgb, var(--detali) 18%, transparent);
   stroke: none;
 }
 
-.detali-limit-visual__label {
+.detali-card-visual__label {
   fill: var(--detali);
   font-family: var(--font-body);
   font-size: 0.7rem;
@@ -3251,13 +3311,18 @@ a.figurine-card__media:active {
   }
 }
 
-.detali-prices .notice {
-  max-width: none;
-}
-
 .detali-price-table th.is-highlight,
 .detali-price-table td.is-highlight {
-  background: color-mix(in srgb, var(--resin) 12%, var(--surface-raised));
+  background: color-mix(in srgb, var(--detali) 14%, var(--surface-raised));
+}
+
+.detali-price-table thead th.is-highlight {
+  color: var(--detali-deep);
+}
+
+.detali-price-table tbody td.is-highlight {
+  font-weight: 600;
+  color: var(--detali-deep);
 }
 
 .detali-price-table__col-label {
@@ -3275,6 +3340,7 @@ a.figurine-card__media:active {
   color: var(--ink);
   font-size: var(--text-ui);
   line-height: var(--leading-ui);
+  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {

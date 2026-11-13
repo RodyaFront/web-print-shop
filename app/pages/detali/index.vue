@@ -150,9 +150,14 @@ useSeoMeta({
           Обираємо за задачею: міцність, гладкість чи під лиття.
         </p>
       </div>
-      <ul class="detali-points">
-        <li v-for="mat in primaryTech.materials" :key="mat.name">
-          <div>
+      <ul class="detali-materials">
+        <li
+          v-for="mat in primaryTech.materials"
+          :key="mat.id"
+          class="detali-materials__item"
+        >
+          <DetaliMaterialVisual :id="mat.id" />
+          <div class="detali-materials__copy">
             <strong>{{ mat.name }}</strong>
             <p>{{ mat.forWhat }}</p>
             <p class="muted">{{ mat.traits }}</p>
@@ -167,7 +172,7 @@ useSeoMeta({
         <p class="lede">
           {{ PARTS_PRICE_FACTORS }}
         </p>
-        <p class="muted">
+        <p class="detali-prices__min">
           Мінімальне замовлення - {{ minOrderLabel }}.
         </p>
       </div>
@@ -180,7 +185,7 @@ useSeoMeta({
         <h3 v-if="technologies.length > 1" class="detali-prices__tech">
           {{ tech.label }}
         </h3>
-        <div class="table-scroll">
+        <div class="table-scroll detali-prices__panel">
           <table class="table detali-price-table">
             <caption class="visually-hidden">
               Ціни {{ tech.label }}, {{ tech.priceUnit }}

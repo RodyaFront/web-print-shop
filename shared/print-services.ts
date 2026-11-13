@@ -32,7 +32,16 @@ export type PrintCapability = {
   hint?: string
 }
 
+export const PRINT_MATERIAL_IDS = [
+  'standard',
+  'engineering',
+  'castable',
+] as const
+
+export type PrintMaterialId = (typeof PRINT_MATERIAL_IDS)[number]
+
 export type PrintMaterialInfo = {
+  id: PrintMaterialId
   name: string
   forWhat: string
   traits: string
@@ -64,7 +73,7 @@ export type PrintTechnology = {
   priceRows: PrintPriceRow[]
 }
 
-export const PARTS_MIN_ORDER_UAH = 350
+export const PARTS_MIN_ORDER_UAH = 550
 
 export const PARTS_ACCEPTED_FILES = 'STL або OBJ'
 
@@ -207,16 +216,19 @@ export const PRINT_TECHNOLOGIES: PrintTechnology[] = [
     ],
     materials: [
       {
+        id: 'standard',
         name: 'Стандартний',
         forWhat: 'Прототипи, корпуси, майстер-моделі під ґрунт і фарбу.',
         traits: 'Гладка поверхня, добре тримає дріб. Не для високих температур.',
       },
       {
+        id: 'engineering',
         name: 'Інженерний',
         forWhat: 'Функційні деталі, кріплення, елементи під навантаження.',
         traits: 'Вища міцність і жорсткість порівняно зі стандартним.',
       },
       {
+        id: 'castable',
         name: 'Ливарний',
         forWhat: 'Майстер-моделі під випалювання / лиття.',
         traits: 'Під випалювання. Не як кінцева деталь у роботі.',
