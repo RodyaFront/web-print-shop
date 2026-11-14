@@ -45,6 +45,8 @@ export type PrintMaterialInfo = {
   name: string
   forWhat: string
   traits: string
+  image: string
+  imageAlt: string
 }
 
 export type PartsUseCase = {
@@ -220,18 +222,24 @@ export const PRINT_TECHNOLOGIES: PrintTechnology[] = [
         name: 'Стандартний',
         forWhat: 'Прототипи, корпуси, майстер-моделі під ґрунт і фарбу.',
         traits: 'Гладка поверхня, добре тримає дріб. Не для високих температур.',
+        image: '/mock/detali/resin-wave.png',
+        imageAlt: 'Стандартна фотополімерна смола',
       },
       {
         id: 'engineering',
         name: 'Інженерний',
         forWhat: 'Функційні деталі, кріплення, елементи під навантаження.',
         traits: 'Вища міцність і жорсткість порівняно зі стандартним.',
+        image: '/mock/detali/resin-wave.png',
+        imageAlt: 'Інженерна фотополімерна смола',
       },
       {
         id: 'castable',
         name: 'Ливарний',
         forWhat: 'Майстер-моделі під випалювання / лиття.',
         traits: 'Під випалювання. Не як кінцева деталь у роботі.',
+        image: '/mock/detali/resin-wave.png',
+        imageAlt: 'Ливарна фотополімерна смола',
       },
     ],
     layerColumns: [

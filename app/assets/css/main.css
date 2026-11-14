@@ -15,6 +15,15 @@
   --detali: #5f8f82;
   --detali-deep: color-mix(in srgb, var(--detali) 78%, #000000);
   --resin: var(--detali);
+  /*
+   * Material resin hues (/detali cards): psychology first, then wave + title share the token.
+   * standard - calm “as-printed” grey for prototypes
+   * engineering - heavy industrial teal for load / strength
+   * castable - wax/jewelry purple (casting resins convention)
+   */
+  --resin-standard: #8b939e;
+  --resin-engineering: #2a564c;
+  --resin-castable: #6b3485;
   /* Hand-paint accent (labels), not page primary */
   --paint: #c43b6e;
   --paint-deep: #9e2f58;
@@ -2825,6 +2834,11 @@ a.figurine-card__media:active {
   margin-block-start: calc(var(--space-3) - var(--space-7));
 }
 
+/* Specs under banner: top offset matches gap between cards (--space-4) */
+.detali-stats + .detali-specs {
+  margin-block-start: calc(var(--space-4) - var(--space-7));
+}
+
 .detali-hero__main {
   display: grid;
   gap: var(--space-4);
@@ -3094,6 +3108,46 @@ a.figurine-card__media:active {
   background: var(--surface-raised);
 }
 
+.detali-materials__media {
+  aspect-ratio: 4 / 2;
+  border-radius: var(--radius-inset);
+  overflow: hidden;
+  background: transparent;
+}
+
+.detali-materials__item[data-material='standard'] {
+  --material-resin: var(--resin-standard);
+}
+
+.detali-materials__item[data-material='engineering'] {
+  --material-resin: var(--resin-engineering);
+}
+
+.detali-materials__item[data-material='castable'] {
+  --material-resin: var(--resin-castable);
+}
+
+/* Cyan wave PNG + filters aimed at --resin-*; title uses the same token */
+.detali-materials__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.detali-materials__item[data-material='standard'] .detali-materials__image {
+  filter: hue-rotate(-18deg) saturate(0.22) brightness(1.14) contrast(0.96);
+}
+
+.detali-materials__item[data-material='engineering'] .detali-materials__image {
+  filter: hue-rotate(-48deg) saturate(0.58) brightness(0.58) contrast(1.08);
+}
+
+.detali-materials__item[data-material='castable'] .detali-materials__image {
+  filter: hue-rotate(108deg) saturate(1.05) brightness(0.88) contrast(1.02);
+}
+
 .detali-materials__copy {
   display: grid;
   gap: var(--space-1);
@@ -3101,9 +3155,12 @@ a.figurine-card__media:active {
 }
 
 .detali-materials__copy strong {
-  font-size: var(--text-ui);
-  line-height: var(--leading-ui);
+  font-size: var(--text-h3);
+  line-height: var(--leading-h3);
   font-weight: 600;
+  letter-spacing: var(--tracking-display);
+  font-family: var(--font-display);
+  color: var(--material-resin);
 }
 
 .detali-materials__copy p {
@@ -3269,7 +3326,7 @@ a.figurine-card__media:active {
   display: grid;
   place-items: center;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 4 / 2;
   border-radius: var(--radius-inset);
   background: color-mix(in srgb, var(--detali) 8%, var(--surface));
 }

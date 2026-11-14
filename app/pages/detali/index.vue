@@ -80,6 +80,25 @@ useSeoMeta({
       </div>
     </aside>
 
+    <dl
+      v-if="primaryTech"
+      class="detali-specs"
+      aria-label="Обмеження друку"
+    >
+      <div
+        v-for="item in primaryTech.capabilities"
+        :key="item.id"
+        class="detali-specs__item"
+      >
+        <DetaliLimitVisual :id="item.id" />
+        <div class="detali-specs__copy">
+          <dt>{{ item.label }}</dt>
+          <dd>{{ item.value }}</dd>
+          <p v-if="item.hint" class="muted">{{ item.hint }}</p>
+        </div>
+      </div>
+    </dl>
+
     <section class="stack" aria-labelledby="use-cases-title">
       <div class="section-title">
         <h2 id="use-cases-title">Які задачі беремо</h2>
@@ -113,35 +132,6 @@ useSeoMeta({
     <section
       v-if="primaryTech"
       class="stack"
-      aria-labelledby="limits-title"
-    >
-      <div class="section-title">
-        <h2 id="limits-title">
-          Обмеження друку
-        </h2>
-        <p class="lede">
-          {{ primaryTech.label }}. Ліміти для вашої моделі.
-        </p>
-      </div>
-      <dl class="detali-specs">
-        <div
-          v-for="item in primaryTech.capabilities"
-          :key="item.id"
-          class="detali-specs__item"
-        >
-          <DetaliLimitVisual :id="item.id" />
-          <div class="detali-specs__copy">
-            <dt>{{ item.label }}</dt>
-            <dd>{{ item.value }}</dd>
-            <p v-if="item.hint" class="muted">{{ item.hint }}</p>
-          </div>
-        </div>
-      </dl>
-    </section>
-
-    <section
-      v-if="primaryTech"
-      class="stack"
       aria-labelledby="materials-title"
     >
       <div class="section-title">
@@ -155,8 +145,19 @@ useSeoMeta({
           v-for="mat in primaryTech.materials"
           :key="mat.id"
           class="detali-materials__item"
+          :data-material="mat.id"
         >
-          <DetaliMaterialVisual :id="mat.id" />
+          <div class="detali-materials__media">
+            <img
+              class="detali-materials__image"
+              :src="mat.image"
+              :alt="mat.imageAlt"
+              width="640"
+              height="320"
+              loading="lazy"
+              decoding="async"
+            >
+          </div>
           <div class="detali-materials__copy">
             <strong>{{ mat.name }}</strong>
             <p>{{ mat.forWhat }}</p>
