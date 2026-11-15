@@ -1,3 +1,5 @@
+import { turntableCenterIndex } from './turntable-scrub'
+
 export const FIGURINE_STATUSES = ['in_stock', 'sold'] as const
 export type FigurineStatus = (typeof FIGURINE_STATUSES)[number]
 
@@ -23,11 +25,42 @@ export type FigurineProduct = {
   status: FigurineStatus
   image: string
   imageAlt: string
+  /**
+   * Optional turntable frames for card scrub (left → right, center = front).
+   * Omit for a static `image` only.
+   */
+  previewFrames?: string[]
   seoTitle: string
   seoDescription: string
   /** Indexable body copy for the product page. */
   description: string
 }
+
+/** −180° … +180°, step 15° (25 frames; ends = back, middle = front). */
+const TURNTABLE_ANGLES_DEG = Array.from(
+  { length: 25 },
+  (_, i) => -180 + i * 15,
+)
+
+function mockTurntableFrames(slug: 'hutao' | 'friren'): string[] {
+  const back = `/mock/figurky/turntable/${slug}/${slug}_m180.png`
+  return TURNTABLE_ANGLES_DEG.map((deg) => {
+    if (deg === 0) return `/mock/figurky/turntable/${slug}/${slug}_z000.png`
+    // ±180° is the same pose — reuse left-back plate on the right end.
+    if (Math.abs(deg) === 180) return back
+    const sign = deg < 0 ? 'm' : 'p'
+    return `/mock/figurky/turntable/${slug}/${slug}_${sign}${String(Math.abs(deg)).padStart(3, '0')}.png`
+  })
+}
+
+/** Shared mock turntables. Replace per product later. */
+export const MOCK_TURNTABLE_HUTAO = mockTurntableFrames('hutao')
+export const MOCK_TURNTABLE_FRIREN = mockTurntableFrames('friren')
+
+const MOCK_TURNTABLE_FRONT =
+  MOCK_TURNTABLE_HUTAO[turntableCenterIndex(MOCK_TURNTABLE_HUTAO.length)]!
+const MOCK_TURNTABLE_FRIREN_FRONT =
+  MOCK_TURNTABLE_FRIREN[turntableCenterIndex(MOCK_TURNTABLE_FRIREN.length)]!
 
 /** MVP mock catalog for /figurky gallery. */
 export const FIGURKY_CATALOG: FigurineProduct[] = [
@@ -42,7 +75,8 @@ export const FIGURKY_CATALOG: FigurineProduct[] = [
     painted: true,
     priceUah: 6200,
     status: 'in_stock',
-    image: '/mock/figurky/01.png',
+    image: MOCK_TURNTABLE_FRONT,
+    previewFrames: [...MOCK_TURNTABLE_HUTAO],
     imageAlt: 'Фігурка Рей Аянамі, ручне фарбування',
     seoTitle: 'Фігурка Рей Аянамі (Evangelion) купити',
     seoDescription:
@@ -61,7 +95,8 @@ export const FIGURKY_CATALOG: FigurineProduct[] = [
     painted: true,
     priceUah: 7800,
     status: 'in_stock',
-    image: '/mock/figurky/02.png',
+    image: MOCK_TURNTABLE_FRONT,
+    previewFrames: [...MOCK_TURNTABLE_HUTAO],
     imageAlt: 'Фігурка Лейли, ручне фарбування',
     seoTitle: 'Фігурка Лейла (Genshin Impact) купити',
     seoDescription:
@@ -80,7 +115,8 @@ export const FIGURKY_CATALOG: FigurineProduct[] = [
     painted: true,
     priceUah: 8100,
     status: 'sold',
-    image: '/mock/figurky/03.png',
+    image: MOCK_TURNTABLE_FRONT,
+    previewFrames: [...MOCK_TURNTABLE_HUTAO],
     imageAlt: 'Фігурка Кецін, ручне фарбування',
     seoTitle: 'Фігурка Кецін (Genshin Impact) купити',
     seoDescription:
@@ -99,7 +135,8 @@ export const FIGURKY_CATALOG: FigurineProduct[] = [
     painted: true,
     priceUah: 9400,
     status: 'in_stock',
-    image: '/mock/figurky/04.png',
+    image: MOCK_TURNTABLE_FRIREN_FRONT,
+    previewFrames: [...MOCK_TURNTABLE_FRIREN],
     imageAlt: 'Фігурка Фрірен, ручне фарбування',
     seoTitle: 'Фігурка Фрірен (Frieren) купити',
     seoDescription:
@@ -118,7 +155,8 @@ export const FIGURKY_CATALOG: FigurineProduct[] = [
     painted: true,
     priceUah: 8600,
     status: 'in_stock',
-    image: '/mock/figurky/05.png',
+    image: MOCK_TURNTABLE_FRONT,
+    previewFrames: [...MOCK_TURNTABLE_HUTAO],
     imageAlt: 'Фігурка Кяру, ручне фарбування',
     seoTitle: 'Фігурка Кяру (Kyaru) купити',
     seoDescription:

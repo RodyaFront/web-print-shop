@@ -4,20 +4,24 @@
  * - top layer + inert backdrop via showModal()
  * - Escape closes (browser cancel → close)
  * - backdrop click closes (optional)
- * - initial focus on the header close control
+ * - initial focus on the close control
  * - restore focus to the previously focused element on close
  */
 const open = defineModel<boolean>('open', { default: false })
 
 const props = withDefaults(
   defineProps<{
+    /** Visible title, or accessible name when `hideTitle` is set. */
     title: string
     /** Optional id for aria-labelledby; auto-generated otherwise. */
     titleId?: string
+    /** Hide the title row; keep `title` as aria-label. Close floats over content. */
+    hideTitle?: boolean
     /** Close when clicking the scrim (dialog element itself). Default true. */
     closeOnBackdrop?: boolean
   }>(),
   {
+    hideTitle: false,
     closeOnBackdrop: true,
   },
 )
@@ -70,12 +74,14 @@ defineExpose({
   <dialog
     ref="dialogRef"
     class="app-modal"
-    :aria-labelledby="titleDomId"
+    :class="{ 'app-modal--chrome-hidden': hideTitle }"
+    :aria-labelledby="hideTitle ? undefined : titleDomId"
+    :aria-label="hideTitle ? title : undefined"
     @close="onDialogClose"
     @click="onDialogClick"
   >
     <div class="app-modal__panel" role="document" @click.stop>
-      <header class="app-modal__header">
+      <header v-if="!hideTitle" class="app-modal__header">
         <h2 :id="titleDomId" class="app-modal__title">
           {{ title }}
         </h2>
@@ -89,6 +95,17 @@ defineExpose({
           <Icon name="ph:x" class="icon-sm" aria-hidden="true" />
         </button>
       </header>
+
+      <button
+        v-else
+        ref="closeBtnRef"
+        class="btn-icon app-modal__close"
+        type="button"
+        aria-label="Закрити"
+        @click="requestClose"
+      >
+        <Icon name="ph:x" class="icon-sm" aria-hidden="true" />
+      </button>
 
       <div class="app-modal__body">
         <slot />

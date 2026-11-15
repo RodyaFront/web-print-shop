@@ -52,7 +52,7 @@ function formatDate(value: string) {
       <p class="muted">Заявок ще немає.</p>
     </div>
 
-    <div v-else class="table-scroll">
+    <div v-else class="table-scroll" data-scroll-x>
       <table class="table">
         <thead>
           <tr>

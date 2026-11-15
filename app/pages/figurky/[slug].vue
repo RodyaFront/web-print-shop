@@ -6,6 +6,7 @@ import {
   formatPriceUah,
   getFigurineByParam,
 } from '../../../shared/figurky-catalog'
+import { uniqueSrcs } from '../../../shared/image-srcs'
 
 const { shopName } = useShop()
 const route = useRoute()
@@ -32,6 +33,21 @@ const inCart = computed(() => (product.value ? has(product.value.id) : false))
 const specs = computed(() =>
   product.value ? figurineSpecs(product.value) : [],
 )
+
+const galleryFrames = computed(() =>
+  uniqueSrcs(product.value?.previewFrames),
+)
+
+const previewOpen = ref(false)
+const previewIndex = shallowRef(0)
+const previewTitle = computed(() =>
+  product.value ? `Фігурка ${product.value.title}` : 'Огляд фігурки',
+)
+
+function openPreview(index: number) {
+  previewIndex.value = index
+  previewOpen.value = true
+}
 
 const canonicalUrl = computed(() =>
   product.value ? `${siteOrigin.value}${figurinePath(product.value)}` : '',
@@ -158,18 +174,22 @@ function addToCart() {
     </nav>
 
     <div class="product-page__layout">
-      <div class="product-page__media" :data-status="product.status">
-        <img
-          class="product-page__image"
-          :src="product.image"
-          :alt="product.imageAlt"
-          width="480"
-          height="600"
-          decoding="async"
-        >
-        <span class="product-page__status" :data-status="product.status">
-          {{ FIGURINE_STATUS_LABELS[product.status] }}
-        </span>
+      <div class="product-page__visual">
+        <div class="product-page__media" :data-status="product.status">
+          <FigurineTurntable
+            :image="product.image"
+            :image-alt="product.imageAlt"
+            :frames="product.previewFrames"
+          />
+          <span class="product-page__status" :data-status="product.status">
+            {{ FIGURINE_STATUS_LABELS[product.status] }}
+          </span>
+        </div>
+
+        <ImageThumbStrip
+          :images="galleryFrames"
+          @select="openPreview"
+        />
       </div>
 
       <div class="product-page__info stack">
@@ -181,9 +201,6 @@ function addToCart() {
         </header>
 
         <p class="product-page__price">{{ formatPriceUah(product.priceUah) }}</p>
-        <p v-if="product.painted" class="product-page__paint">
-          Друк і ручне фарбування
-        </p>
 
         <div class="product-page__actions row">
           <button
@@ -237,5 +254,13 @@ function addToCart() {
         </section>
       </div>
     </div>
+
+    <ImagePreviewModal
+      v-model:open="previewOpen"
+      v-model:index="previewIndex"
+      :images="galleryFrames"
+      :alt="product.imageAlt"
+      :title="previewTitle"
+    />
   </div>
 </template>

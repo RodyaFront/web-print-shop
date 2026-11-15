@@ -33,15 +33,11 @@ function addToCart() {
       :to="href"
       :aria-label="product.title"
     >
-      <img
-        class="figurine-card__image"
-        :src="product.image"
-        :alt="product.imageAlt"
-        width="320"
-        height="400"
-        loading="lazy"
-        decoding="async"
-      >
+      <FigurineTurntable
+        :image="product.image"
+        :image-alt="product.imageAlt"
+        :frames="product.previewFrames"
+      />
       <span class="figurine-card__status" :data-status="product.status">
         {{ FIGURINE_STATUS_LABELS[product.status] }}
       </span>
@@ -54,7 +50,6 @@ function addToCart() {
         </NuxtLink>
       </h3>
       <p class="figurine-card__meta">{{ metaLine }}</p>
-      <p v-if="product.painted" class="figurine-card__paint">Ручне фарбування</p>
       <p class="figurine-card__price">{{ formatPriceUah(product.priceUah) }}</p>
     </div>
 

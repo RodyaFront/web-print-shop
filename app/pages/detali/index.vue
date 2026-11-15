@@ -186,7 +186,7 @@ useSeoMeta({
         <h3 v-if="technologies.length > 1" class="detali-prices__tech">
           {{ tech.label }}
         </h3>
-        <div class="table-scroll detali-prices__panel">
+        <div class="table-scroll detali-prices__panel" data-scroll-x>
           <table class="table detali-price-table">
             <caption class="visually-hidden">
               Ціни {{ tech.label }}, {{ tech.priceUnit }}
