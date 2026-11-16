@@ -5,7 +5,6 @@ import {
   type DeliveryCarrier,
   type DeliveryMethod,
 } from '../../../shared/delivery'
-import { getFigurineById } from '../../../shared/figurky-catalog'
 import {
   isPaymentMethod,
   isValidUaPhone,
@@ -13,6 +12,7 @@ import {
   type PaymentMethod,
   type ReadyOrderItem,
 } from '../../../shared/shop'
+import { reserveReadyFigurines, restoreFigurinesInStock } from '../../utils/catalog'
 import { isOrderType, createOrder } from '../../utils/storage'
 
 function asText(value: unknown) {
@@ -138,6 +138,8 @@ export default defineEventHandler(async (event) => {
   let items: ReadyOrderItem[] = []
   let totalUah: number | null = null
 
+  let reservedIds: string[] = []
+
   if (type === 'ready') {
     const productIds = [...new Set(parseProductIds(fields.get('productIds')))]
     if (!productIds.length) {
@@ -147,20 +149,13 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    for (const productId of productIds) {
-      const product = getFigurineById(productId)
-      if (!product || product.status !== 'in_stock') {
-        throw createError({
-          statusCode: 400,
-          message: `Позиція «${productId}» недоступна для замовлення`,
-        })
-      }
-      items.push({
-        id: product.id,
-        title: product.title,
-        priceUah: product.priceUah,
-      })
-    }
+    const reserved = await reserveReadyFigurines(productIds)
+    reservedIds = reserved.map((product) => product.id)
+    items = reserved.map((product) => ({
+      id: product.id,
+      title: product.title,
+      priceUah: product.priceUah,
+    }))
 
     totalUah = items.reduce((sum, item) => sum + item.priceUah, 0)
     description = items.map((item) => item.title).join(', ')
@@ -200,37 +195,44 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const order = await createOrder({
-    type,
-    name,
-    phone,
-    telegram,
-    viber,
-    whatsapp,
-    city,
-    deliveryAddress,
-    description,
-    size,
-    comment,
-    needsPainting,
-    isAdultContent,
-    characterAdultConfirmed,
-    items,
-    totalUah,
-    deliveryCarrier,
-    deliveryMethod,
-    deliveryCityLabel,
-    deliveryCityArea,
-    deliveryCityRef,
-    deliveryPointId,
-    deliveryPointLabel,
-    paymentMethod,
-    uploads,
-  })
+  try {
+    const order = await createOrder({
+      type,
+      name,
+      phone,
+      telegram,
+      viber,
+      whatsapp,
+      city,
+      deliveryAddress,
+      description,
+      size,
+      comment,
+      needsPainting,
+      isAdultContent,
+      characterAdultConfirmed,
+      items,
+      totalUah,
+      deliveryCarrier,
+      deliveryMethod,
+      deliveryCityLabel,
+      deliveryCityArea,
+      deliveryCityRef,
+      deliveryPointId,
+      deliveryPointLabel,
+      paymentMethod,
+      uploads,
+    })
 
-  return {
-    id: order.id,
-    type: order.type,
-    createdAt: order.createdAt,
+    return {
+      id: order.id,
+      type: order.type,
+      createdAt: order.createdAt,
+    }
+  } catch (error) {
+    if (reservedIds.length) {
+      await restoreFigurinesInStock(reservedIds)
+    }
+    throw error
   }
 })

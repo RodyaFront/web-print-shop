@@ -23,6 +23,12 @@ logs
 .env.*
 !.env.example
 
-# Order storage (local MVP)
+# Runtime site state (local MVP)
 data/orders/*
 !data/orders/.gitkeep
+data/catalog/*
+!data/catalog/.gitkeep
+data/settings/*
+!data/settings/.gitkeep
+data/media/*
+!data/media/.gitkeep

@@ -52,7 +52,17 @@ export type OrderRecord = {
   deliveryPointId: string
   deliveryPointLabel: string
   paymentMethod: PaymentMethod
+  adminNote: string
+  quotedPriceUah: number | null
+  trackingNumber: string
   files: OrderFile[]
+}
+
+export type OrderPatch = {
+  status?: OrderStatus
+  adminNote?: string
+  quotedPriceUah?: number | null
+  trackingNumber?: string
 }
 
 function ordersRoot() {
@@ -111,13 +121,38 @@ export async function getOrder(id: string): Promise<OrderRecord | null> {
   }
 }
 
-export async function updateOrderStatus(id: string, status: OrderStatus) {
+export async function updateOrder(id: string, patch: OrderPatch) {
   const order = await getOrder(id)
   if (!order) return null
-  order.status = status
+
+  const previousStatus = order.status
+
+  if (patch.status !== undefined) order.status = patch.status
+  if (patch.adminNote !== undefined) order.adminNote = patch.adminNote
+  if (patch.quotedPriceUah !== undefined) order.quotedPriceUah = patch.quotedPriceUah
+  if (patch.trackingNumber !== undefined) {
+    order.trackingNumber = patch.trackingNumber
+  }
+
   order.updatedAt = new Date().toISOString()
   await writeFile(metaPath(id), JSON.stringify(order, null, 2), 'utf8')
+
+  if (
+    order.type === 'ready'
+    && order.status === 'cancelled'
+    && previousStatus !== 'cancelled'
+    && order.items.length
+  ) {
+    const { restoreFigurinesInStock } = await import('./catalog')
+    await restoreFigurinesInStock(order.items.map((item) => item.id))
+  }
+
   return order
+}
+
+/** @deprecated Prefer updateOrder */
+export async function updateOrderStatus(id: string, status: OrderStatus) {
+  return updateOrder(id, { status })
 }
 
 export async function getOrderFile(orderId: string, fileId: string) {
@@ -161,9 +196,19 @@ function normalizeOrder(raw: Record<string, unknown>): OrderRecord {
         ? items.reduce((sum, item) => sum + item.priceUah, 0)
         : null
 
+  const quotedRaw = raw.quotedPriceUah
+  const quotedPriceUah =
+    typeof quotedRaw === 'number' && Number.isFinite(quotedRaw)
+      ? quotedRaw
+      : null
+
+  const statusRaw = String(raw.status ?? 'new')
+  const status: OrderStatus = isOrderStatus(statusRaw) ? statusRaw : 'new'
+
   return {
     ...(raw as unknown as OrderRecord),
     type,
+    status,
     items,
     totalUah,
     deliveryCarrier: (raw.deliveryCarrier as DeliveryCarrier | null) ?? null,
@@ -177,6 +222,9 @@ function normalizeOrder(raw: Record<string, unknown>): OrderRecord {
     viber: String(raw.viber ?? ''),
     whatsapp: String(raw.whatsapp ?? ''),
     paymentMethod: raw.paymentMethod === 'card' ? 'card' : 'cod',
+    adminNote: String(raw.adminNote ?? ''),
+    quotedPriceUah,
+    trackingNumber: String(raw.trackingNumber ?? ''),
     isAdultContent: Boolean(raw.isAdultContent) || legacyAdult,
     characterAdultConfirmed:
       raw.characterAdultConfirmed === true
@@ -298,6 +346,9 @@ export async function createOrder(input: CreateOrderInput): Promise<OrderRecord>
     deliveryPointId: input.deliveryPointId ?? '',
     deliveryPointLabel: input.deliveryPointLabel ?? '',
     paymentMethod: input.paymentMethod === 'card' ? 'card' : 'cod',
+    adminNote: '',
+    quotedPriceUah: null,
+    trackingNumber: '',
     files,
   }
 

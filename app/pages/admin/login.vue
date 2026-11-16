@@ -22,7 +22,7 @@ async function onSubmit(event: Event) {
       method: 'POST',
       body: { password: password.value },
     })
-    await navigateTo('/admin/orders')
+    await navigateTo('/admin')
   } catch {
     error.value = 'Невірний пароль'
   } finally {
@@ -35,7 +35,7 @@ async function onSubmit(event: Event) {
   <div class="age-gate">
     <form class="card age-gate__panel stack" @submit="onSubmit">
       <h1>Вхід до адмінки</h1>
-      <p class="muted">Список заявок доступний лише з паролем.</p>
+      <p class="muted">Кабінет доступний лише з паролем.</p>
       <div v-if="error" class="error-box" role="alert">{{ error }}</div>
       <div class="field">
         <label for="password">Пароль</label>
@@ -51,7 +51,7 @@ async function onSubmit(event: Event) {
       <button class="btn btn-primary" type="submit" :disabled="submitting">
         {{ submitting ? 'Перевіряємо…' : 'Увійти' }}
       </button>
-      <NuxtLink to="/">На головну</NuxtLink>
+      <NuxtLink to="/figurky">На головну</NuxtLink>
     </form>
   </div>
 </template>

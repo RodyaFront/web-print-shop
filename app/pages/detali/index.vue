@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import {
-  availablePrintTechnologies,
-  formatPartsMinOrder,
   PARTS_ACCEPTED_FILES,
   PARTS_DELIVERY_SUMMARY,
   PARTS_LEAD_TIME,
@@ -12,34 +10,40 @@ import {
 } from '../../../shared/print-services'
 
 const { shopName } = useShop()
+const { technologies, minOrderLabel } = usePricing()
+await useFetch('/api/pricing', { key: 'parts-pricing' })
 
-const technologies = availablePrintTechnologies()
-const minOrderLabel = formatPartsMinOrder()
-const priceFrom = technologies[0]?.priceFrom || ''
-const primaryTech = technologies[0]
-const printArea =
-  primaryTech?.capabilities.find((item) => item.id === 'build-volume')
-    ?.value || ''
-const heroStats = partsStatsBanner({
-  printArea,
-  priceFrom,
-  minOrderLabel,
-})
+const priceFrom = computed(() => technologies.value[0]?.priceFrom || '')
+const primaryTech = computed(() => technologies.value[0])
+const printArea = computed(
+  () =>
+    primaryTech.value?.capabilities.find((item) => item.id === 'build-volume')
+      ?.value || '',
+)
+const heroStats = computed(() =>
+  partsStatsBanner({
+    printArea: printArea.value,
+    priceFrom: priceFrom.value,
+    minOrderLabel: minOrderLabel.value,
+  }),
+)
 
-const metaDescription = [
-  '3D-друк деталей в Одесі за вашою моделлю: прототипи, корпуси, функційні деталі.',
-  'Фотополімер, STL або OBJ.',
-  priceFrom ? `Ціни від ${priceFrom}.` : '',
-  'Доставка по Україні.',
-]
-  .filter(Boolean)
-  .join(' ')
+const metaDescription = computed(() =>
+  [
+    '3D-друк деталей в Одесі за вашою моделлю: прототипи, корпуси, функційні деталі.',
+    'Фотополімер, STL або OBJ.',
+    priceFrom.value ? `Ціни від ${priceFrom.value}.` : '',
+    'Доставка по Україні.',
+  ]
+    .filter(Boolean)
+    .join(' '),
+)
 
 useSeoMeta({
   title: `3D-друк Одеса - деталі на замовлення | ${shopName}`,
-  description: metaDescription,
+  description: () => metaDescription.value,
   ogTitle: `3D-друк Одеса - деталі на замовлення | ${shopName}`,
-  ogDescription: metaDescription,
+  ogDescription: () => metaDescription.value,
 })
 </script>
 

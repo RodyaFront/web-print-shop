@@ -6,6 +6,8 @@ const props = defineProps<{
   image: string
   imageAlt: string
   frames?: readonly string[] | null
+  /** Parallel labels for the active scrub frame (admin constructor, etc.). */
+  frameMeta?: readonly string[] | null
 }>()
 
 const previewFrames = computed(() => props.frames)
@@ -20,6 +22,12 @@ const {
   onPointerMove,
   onPointerLeave,
 } = useTurntableScrub(previewFrames)
+
+const activeFrameMeta = computed(() => {
+  const list = props.frameMeta
+  if (!list?.length || !frames.value) return ''
+  return list[frameIndex.value] ?? ''
+})
 </script>
 
 <template>
@@ -58,6 +66,14 @@ const {
           draggable="false"
         >
       </div>
+
+      <p
+        v-if="activeFrameMeta"
+        class="figurine-turntable__meta"
+        aria-live="polite"
+      >
+        {{ activeFrameMeta }}
+      </p>
     </div>
 
     <div

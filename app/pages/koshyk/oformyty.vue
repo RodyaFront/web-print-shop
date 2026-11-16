@@ -10,6 +10,8 @@ import {
 } from '../../../shared/shop'
 
 const { shopName } = useShop()
+useCatalog()
+await useFetch('/api/figurky', { key: 'figurky-catalog' })
 const { items, count, totalUah, ids, clear } = useCart()
 
 const submitting = ref(false)

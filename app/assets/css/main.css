@@ -1688,32 +1688,354 @@ a.header-order__item--figurine:active > .icon {
   padding-block: var(--space-3);
 }
 
+.admin-bar__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.admin-bar__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
 .admin-bar a {
   color: var(--paint-ink);
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-block: var(--space-2);
+  line-height: 1;
   transform: translateY(0);
   text-decoration: none;
-  box-shadow: 0 0.0625rem 0 color-mix(in srgb, var(--paint-ink) 35%, transparent);
+  box-shadow: none;
   touch-action: manipulation;
+}
+
+.admin-bar a.is-active {
+  font-weight: 600;
+  color: color-mix(in srgb, var(--paint-ink) 72%, var(--figurky));
+}
+
+/* Same vertical rhythm as nav links; no lip that shifts optical center */
+.admin-bar .btn {
+  min-height: 0;
+  padding-block: var(--space-2);
+  padding-inline: var(--space-4);
+  line-height: 1;
+  box-shadow: none;
+}
+
+.admin-bar .btn:active:not(:disabled) {
+  box-shadow: var(--press-inset);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html:not([data-pointer='touch']) .admin-bar .btn:hover:not(:disabled) {
+    box-shadow: none;
+  }
+
+  html:not([data-pointer='touch']) .admin-bar .btn:hover:active:not(:disabled) {
+    box-shadow: var(--press-inset);
+  }
+}
+
+.admin-summary {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.admin-summary__value {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  font-weight: 600;
+  line-height: 1.15;
+  margin-block: 0;
+}
+
+.admin-work-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.admin-filters {
+  flex-wrap: wrap;
+}
+
+.admin-catalog-thumb {
+  width: 4rem;
+  height: 4rem;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-input) 80%, var(--filament));
+}
+
+.admin-catalog-preview {
+  max-width: 16rem;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-input) 80%, var(--filament));
+}
+
+.figurine-turntable.admin-turntable-preview {
+  width: min(100%, 28rem);
+  height: auto;
+  aspect-ratio: 1;
+  margin-inline: auto;
+  border: var(--hairline) solid var(--line);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-input) 80%, var(--filament));
+  overflow: hidden;
+}
+
+.admin-turntable-strip__count {
+  margin-block: 0;
+  font-size: var(--text-ui);
+  line-height: var(--leading-ui);
+  font-weight: 600;
+}
+
+.admin-turntable-strip__soft-warn {
+  color: color-mix(in srgb, var(--ink) 70%, var(--figurky));
+}
+
+.admin-turntable-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: var(--hairline) dashed var(--line);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-input) 70%, transparent);
+}
+
+.admin-turntable-pool__card {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: var(--space-1);
+  width: 6rem;
+}
+
+.admin-turntable-pool__thumb {
+  display: block;
+  margin: 0;
+  padding: 0;
+  width: 5.5rem;
+  height: 5.5rem;
+  border: var(--hairline) solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface-input) 80%, var(--filament));
+  cursor: grab;
+  touch-action: none;
+  box-shadow: var(--press-shadow);
+  overflow: hidden;
+}
+
+.admin-turntable-pool__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.admin-turntable-pool__thumb:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.admin-turntable-pool__thumb:active:not(:disabled) {
+  transform: translateY(var(--press-depth));
+  box-shadow: var(--press-inset);
+}
+
+.admin-turntable-pool__name {
+  margin-block: 0;
+  width: 100%;
+  text-align: center;
+  font-size: var(--text-caption);
+  line-height: var(--leading-ui);
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-turntable-pool__remove {
+  min-height: 0;
+  padding-block: var(--space-1);
+  padding-inline: var(--space-2);
+}
+
+.admin-turntable-strip {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-block: var(--space-2);
+  padding-inline: var(--space-1);
+  scroll-snap-type: x proximity;
+}
+
+.admin-turntable-strip__slot {
+  flex: 0 0 auto;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  width: 5.5rem;
+  scroll-snap-align: center;
+}
+
+.admin-turntable-strip__yaw {
+  font-size: var(--text-caption);
+  line-height: var(--leading-ui);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.admin-turntable-strip__slot.is-front .admin-turntable-strip__yaw,
+.admin-turntable-strip__slot.is-back .admin-turntable-strip__yaw {
+  color: var(--ink);
+}
+
+.admin-turntable-strip__thumb {
+  display: block;
+  margin: 0;
+  padding: 0;
+  width: 5.5rem;
+  height: 5.5rem;
+  border: var(--hairline) solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface-input) 80%, var(--filament));
+  cursor: grab;
+  touch-action: none;
+  box-shadow: var(--press-shadow);
+  overflow: hidden;
+}
+
+.admin-turntable-strip__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.admin-turntable-strip__thumb:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.admin-turntable-strip__thumb:active:not(:disabled) {
+  cursor: grabbing;
+  transform: translateY(var(--press-depth));
+  box-shadow: var(--press-inset);
+}
+
+.admin-turntable-strip__slot.is-selected .admin-turntable-strip__thumb,
+.admin-turntable-strip__slot.is-selected .admin-turntable-strip__placeholder {
+  border-color: color-mix(in srgb, var(--figurky) 55%, var(--line));
+  box-shadow: var(--press-shadow-hover);
+}
+
+.admin-turntable-strip__slot.is-drop-target .admin-turntable-strip__thumb,
+.admin-turntable-strip__slot.is-drop-target .admin-turntable-strip__placeholder {
+  border-color: var(--figurky);
+  background: color-mix(in srgb, var(--figurky) 12%, var(--surface-input));
+}
+
+.admin-turntable-strip__slot.is-back .admin-turntable-strip__thumb,
+.admin-turntable-strip__slot.is-front .admin-turntable-strip__thumb,
+.admin-turntable-strip__slot.is-back .admin-turntable-strip__placeholder,
+.admin-turntable-strip__slot.is-front .admin-turntable-strip__placeholder {
+  border-color: color-mix(in srgb, var(--figurky) 45%, var(--line));
+}
+
+.admin-turntable-strip__slot.is-tail .admin-turntable-strip__thumb,
+.admin-turntable-strip__slot.is-tail .admin-turntable-strip__placeholder {
+  border-style: dashed;
+}
+
+.admin-turntable-strip__placeholder {
+  width: 5.5rem;
+  height: 5.5rem;
+  border: var(--hairline) dashed var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface-input) 55%, transparent);
+}
+
+.admin-turntable-strip__role {
+  width: 100%;
+  font-size: var(--text-caption);
+  line-height: var(--leading-ui);
+  font-weight: 600;
+  text-align: center;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-turntable-strip__role--file {
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+
+.admin-turntable-strip__toolbar {
+  flex-wrap: wrap;
+}
+
+.admin-turntable-strip__toolbar .btn {
+  min-height: 0;
+  padding-block: var(--space-2);
+  padding-inline: var(--space-3);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html:not([data-pointer='touch']) .admin-turntable-pool__thumb:hover:not(:disabled),
+  html:not([data-pointer='touch']) .admin-turntable-strip__thumb:hover:not(:disabled) {
+    transform: translateY(var(--press-raise));
+    box-shadow: var(--press-shadow-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-turntable-pool__thumb:active:not(:disabled),
+  .admin-turntable-strip__thumb:active:not(:disabled),
+  html:not([data-pointer='touch']) .admin-turntable-pool__thumb:hover:not(:disabled),
+  html:not([data-pointer='touch']) .admin-turntable-strip__thumb:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+.btn.is-pressed {
+  box-shadow: var(--press-inset);
+  transform: translateY(var(--press-depth));
 }
 
 .admin-bar a:active {
   transform: translateY(var(--press-depth));
-  color: color-mix(in srgb, var(--paint-ink) 78%, var(--paint));
-  box-shadow: none;
+  color: color-mix(in srgb, var(--paint-ink) 55%, var(--figurky));
 }
 
 @media (hover: hover) and (pointer: fine) {
   html:not([data-pointer='touch']) .admin-bar a:hover {
-    color: color-mix(in srgb, var(--paint-ink) 88%, var(--resin));
+    color: color-mix(in srgb, var(--paint-ink) 42%, var(--figurky));
     transform: translateY(var(--press-raise));
-    box-shadow: 0 0.125rem 0 color-mix(in srgb, var(--paint-ink) 50%, transparent);
   }
 
   html:not([data-pointer='touch']) .admin-bar a:hover:active {
-    color: color-mix(in srgb, var(--paint-ink) 78%, var(--paint));
+    color: color-mix(in srgb, var(--paint-ink) 55%, var(--figurky));
     transform: translateY(var(--press-depth));
-    box-shadow: none;
   }
 }
 
@@ -1933,6 +2255,7 @@ a.figurine-card__media:hover:active {
 }
 
 .figurine-turntable__stage {
+  position: relative;
   display: grid;
   width: 100%;
   height: 100%;
@@ -1943,6 +2266,24 @@ a.figurine-card__media:hover:active {
   grid-area: 1 / 1;
   width: 100%;
   height: 100%;
+}
+
+.figurine-turntable__meta {
+  position: absolute;
+  z-index: 2;
+  inset-inline: var(--space-3);
+  inset-block-start: var(--space-3);
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-raised) 88%, transparent);
+  color: var(--ink);
+  font-size: var(--text-caption);
+  line-height: var(--leading-ui);
+  font-weight: 600;
+  text-align: center;
+  pointer-events: none;
+  overflow-wrap: anywhere;
 }
 
 .figurine-turntable__frames {

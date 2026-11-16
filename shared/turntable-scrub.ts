@@ -1,16 +1,25 @@
 /**
  * Pointer → turntable frame mapping + return-spring timing.
  *
- * Frame contract (catalog / Blender pipeline):
+ * Frame contract (live photos or renders):
  * - Odd-length list, left → right by yaw.
- * - Middle index = front (0°).
- * - Both ends = same back plate URL (±180°).
+ * - Middle index = front.
+ * - Both ends = same back photo URL (closes the full turn).
  *
  * Scrub bands are wider at the edges and tighter near the front:
  *   [==== back ====] … [= near =][= front =][= near =] … [==== back ====]
  *
  * Thumb progress is linear in frame index (step position), not pointer X.
  */
+
+/**
+ * Recommended strip length for smooth scrub (~15° yaw steps from −180° to +180°).
+ * Odd so there is a unique front in the middle; ends share one back photo.
+ */
+export const TURNTABLE_TARGET_FRAMES = 25
+
+/** Degrees between neighbouring frames at the recommended count. */
+export const TURNTABLE_TARGET_STEP_DEG = 360 / (TURNTABLE_TARGET_FRAMES - 1)
 
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value))
@@ -24,6 +33,50 @@ function lerp(a: number, b: number, t: number) {
 export function turntableCenterIndex(frameCount: number): number {
   if (frameCount <= 1) return 0
   return Math.floor((frameCount - 1) / 2)
+}
+
+/** Yaw step between neighbours for a strip of `frameCount` frames (−180…+180). */
+export function turntableStepDeg(frameCount: number): number {
+  if (frameCount <= 1) return 0
+  return 360 / (frameCount - 1)
+}
+
+/**
+ * Nominal yaw for strip index `i` in a left→right −180…+180 layout.
+ * Middle index is 0° (front); both ends are ±180° (back).
+ */
+export function turntableYawDegrees(
+  index: number,
+  frameCount: number = TURNTABLE_TARGET_FRAMES,
+): number {
+  if (frameCount <= 1) return 0
+  return -180 + index * turntableStepDeg(frameCount)
+}
+
+/** UI label: `0°`, `+15°`, `-180°`. */
+export function formatTurntableYaw(degrees: number): string {
+  const rounded = Math.round(degrees)
+  if (rounded === 0) return '0°'
+  return `${rounded > 0 ? '+' : ''}${rounded}°`
+}
+
+/**
+ * Rotate a dense strip so `frontIndex` lands on the center (0° / анфас).
+ * Relative neighbour order is preserved (ring shift).
+ */
+export function rotateTurntableToFront<T>(
+  frames: readonly T[],
+  frontIndex: number,
+): T[] {
+  const n = frames.length
+  if (n === 0) return []
+  const center = turntableCenterIndex(n)
+  const from = ((frontIndex % n) + n) % n
+  if (from === center) return frames.slice()
+  return Array.from(
+    { length: n },
+    (_, j) => frames[(from + j - center + n) % n]!,
+  )
 }
 
 /**
@@ -42,7 +95,7 @@ export function assertTurntableFrames(frames: readonly string[]): void {
   const last = frames[frames.length - 1]
   if (first !== last) {
     throw new Error(
-      'turntable: first and last frames must be the same back plate (±180°)',
+      'turntable: first and last frames must be the same back photo',
     )
   }
 }

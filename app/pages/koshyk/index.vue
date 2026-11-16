@@ -6,6 +6,8 @@ import {
 } from '../../../shared/figurky-catalog'
 
 const { shopName } = useShop()
+useCatalog()
+await useFetch('/api/figurky', { key: 'figurky-catalog' })
 const { items, count, totalUah, remove } = useCart()
 
 useSeoMeta({

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { FIGURKY_CATALOG, figurinePath } from '../../../shared/figurky-catalog'
+import { figurinePath } from '../../../shared/figurky-catalog'
 
 const { shopName } = useShop()
 const siteOrigin = useSiteOrigin()
+const { catalog } = useCatalog()
+await useFetch('/api/figurky', { key: 'figurky-catalog' })
 
-const catalog = FIGURKY_CATALOG
 const catalogUrl = computed(() => `${siteOrigin.value}/figurky`)
 
 const productGridRef = ref<HTMLElement | null>(null)
@@ -13,7 +14,7 @@ const gridColumnCount = ref(1)
 const fillerCount = computed(() => {
   const cols = gridColumnCount.value
   if (cols <= 1) return 0
-  const rem = catalog.length % cols
+  const rem = catalog.value.length % cols
   return rem === 0 ? 0 : cols - rem
 })
 
@@ -63,7 +64,7 @@ useHead(() => {
     url: catalogUrl.value,
     mainEntity: {
       '@type': 'ItemList',
-      itemListElement: catalog.map((product, index) => ({
+      itemListElement: catalog.value.map((product, index) => ({
         '@type': 'ListItem',
         position: index + 1,
         url: `${siteOrigin.value}${figurinePath(product)}`,

@@ -60,7 +60,7 @@ onBeforeUnmount(() => {
   <header class="site-header">
     <div class="site-header__inner">
       <div class="site-header__primary">
-        <NuxtLink class="brand" to="/" :aria-label="shopName">
+        <NuxtLink class="brand" to="/figurky" :aria-label="shopName">
           <ShopLogo class="brand__mark" />
           <span class="brand__name">{{ shopName }}</span>
         </NuxtLink>

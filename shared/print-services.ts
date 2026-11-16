@@ -1,7 +1,14 @@
 /**
  * Print technologies for /detali.
  * Public fields are customer-facing (limits, prices). Machine models stay out of UI.
+ * Sell rates come from pricing settings (defaults in print-costing.ts).
  */
+
+import {
+  PRINT_COSTING_DEFAULTS,
+  PRINT_SELL_RATE_ENGINEERING_LABEL,
+  PRINT_SELL_RATE_LABEL,
+} from './print-costing'
 
 export type PrintLayerColumn = {
   key: string
@@ -35,7 +42,6 @@ export type PrintCapability = {
 export const PRINT_MATERIAL_IDS = [
   'standard',
   'engineering',
-  'castable',
 ] as const
 
 export type PrintMaterialId = (typeof PRINT_MATERIAL_IDS)[number]
@@ -75,7 +81,14 @@ export type PrintTechnology = {
   priceRows: PrintPriceRow[]
 }
 
-export const PARTS_MIN_ORDER_UAH = 550
+export type PartsPricingInput = {
+  standardUahPerG: number
+  engineeringUahPerG: number
+  partsMinOrderUah: number
+}
+
+/** Fallback when pricing API is unavailable (build-time / SSR edge). */
+export const PARTS_MIN_ORDER_UAH = 250
 
 export const PARTS_ACCEPTED_FILES = 'STL або OBJ'
 
@@ -181,109 +194,118 @@ export const PARTS_LEAD_TIME =
 export const PARTS_DELIVERY_SUMMARY =
   'Доставка поштою лише по Україні. Оплата накладеним платежем або на картку - оберете після узгодження ціни. Онлайн-оплати на сайті немає.'
 
-export const PRINT_TECHNOLOGIES: PrintTechnology[] = [
-  {
-    id: 'sla',
-    label: 'Фотополімер',
-    shortLabel: 'Фотополімер',
-    available: true,
-    priceUnit: 'грн/г',
-    priceFrom: '29,7 грн/г',
-    summary:
-      'Гладка поверхня й дрібні елементи. Корпуси, кріплення, майстер-моделі, складна форма.',
-    capabilities: [
-      {
-        id: 'build-volume',
-        label: 'Максимальний розмір',
-        value: 'до 212 × 118 × 220 мм',
-      },
-      {
-        id: 'wall',
-        label: 'Мін. товщина стінок',
-        value: 'орієнтир від 0,6 мм',
-        hint: 'Для надійного друку. Тонші місця узгоджуємо по файлу.',
-      },
-      {
-        id: 'feature',
-        label: 'Дрібні елементи',
-        value: 'орієнтир від ~0,4 мм',
-        hint: 'При шарі 50 мкм. Тонший шар дає чіткіші грані.',
-      },
-      {
-        id: 'layer',
-        label: 'Товщина шару',
-        value: '25-100 мкм',
-        hint: '50 мкм - зазвичай оптимальний баланс швидкості й якості.',
-      },
-    ],
-    materials: [
-      {
-        id: 'standard',
-        name: 'Стандартний',
-        forWhat: 'Прототипи, корпуси, майстер-моделі під ґрунт і фарбу.',
-        traits: 'Гладка поверхня, добре тримає дріб. Не для високих температур.',
-        image: '/mock/detali/resin-wave.png',
-        imageAlt: 'Стандартна фотополімерна смола',
-      },
-      {
-        id: 'engineering',
-        name: 'Інженерний',
-        forWhat: 'Функційні деталі, кріплення, елементи під навантаження.',
-        traits: 'Вища міцність і жорсткість порівняно зі стандартним.',
-        image: '/mock/detali/resin-wave.png',
-        imageAlt: 'Інженерна фотополімерна смола',
-      },
-      {
-        id: 'castable',
-        name: 'Ливарний',
-        forWhat: 'Майстер-моделі під випалювання / лиття.',
-        traits: 'Під випалювання. Не як кінцева деталь у роботі.',
-        image: '/mock/detali/resin-wave.png',
-        imageAlt: 'Ливарна фотополімерна смола',
-      },
-    ],
-    layerColumns: [
-      { key: '100', label: '100 мкм', hint: 'Швидше' },
-      { key: '50', label: '50 мкм', hint: 'Оптимально', highlight: true },
-      { key: '25', label: '25 мкм', hint: 'Найтонше' },
-    ],
-    priceRows: [
-      {
-        material: 'Стандартний',
-        prices: {
-          '100': 'від 29,7 грн/г',
-          '50': 'від 31,7 грн/г',
-          '25': 'від 34,1 грн/г',
-        },
-      },
-      {
-        material: 'Інженерний',
-        prices: {
-          '100': 'від 35,6 грн/г',
-          '50': 'від 36 грн/г',
-          '25': 'від 36,7 грн/г',
-        },
-      },
-      {
-        material: 'Ливарний',
-        prices: {
-          '100': 'від 40,2 грн/г',
-          '50': 'від 45,2 грн/г',
-          '25': '-',
-        },
-      },
-    ],
-  },
-]
-
-export function availablePrintTechnologies() {
-  return PRINT_TECHNOLOGIES.filter((tech) => tech.available)
+function rateLabel(uahPerG: number) {
+  return `${uahPerG} грн/г`
 }
 
-export function formatPartsMinOrder() {
+export function buildPrintTechnologies(
+  pricing: PartsPricingInput = {
+    standardUahPerG: PRINT_COSTING_DEFAULTS.sellUahPerG,
+    engineeringUahPerG: PRINT_COSTING_DEFAULTS.sellUahPerGEngineering,
+    partsMinOrderUah: PARTS_MIN_ORDER_UAH,
+  },
+): PrintTechnology[] {
+  const standardLabel = rateLabel(pricing.standardUahPerG)
+  const engineeringLabel = rateLabel(pricing.engineeringUahPerG)
+
+  return [
+    {
+      id: 'sla',
+      label: 'Фотополімер',
+      shortLabel: 'Фотополімер',
+      available: true,
+      priceUnit: 'грн/г',
+      priceFrom: standardLabel,
+      summary:
+        'Гладка поверхня й дрібні елементи. Корпуси, кріплення, майстер-моделі, складна форма.',
+      capabilities: [
+        {
+          id: 'build-volume',
+          label: 'Максимальний розмір',
+          value: 'до 212 × 118 × 220 мм',
+        },
+        {
+          id: 'wall',
+          label: 'Мін. товщина стінок',
+          value: 'орієнтир від 0,6 мм',
+          hint: 'Для надійного друку. Тонші місця узгоджуємо по файлу.',
+        },
+        {
+          id: 'feature',
+          label: 'Дрібні елементи',
+          value: 'орієнтир від ~0,4 мм',
+          hint: 'При шарі 50 мкм. Тонший шар дає чіткіші грані.',
+        },
+        {
+          id: 'layer',
+          label: 'Товщина шару',
+          value: '25-100 мкм',
+          hint: '50 мкм - зазвичай оптимальний баланс швидкості й якості.',
+        },
+      ],
+      materials: [
+        {
+          id: 'standard',
+          name: 'Стандартний',
+          forWhat: 'Прототипи, корпуси, майстер-моделі під ґрунт і фарбу.',
+          traits: 'Гладка поверхня, добре тримає дріб. Не для високих температур.',
+          image: '/mock/detali/resin-wave.png',
+          imageAlt: 'Стандартна фотополімерна смола',
+        },
+        {
+          id: 'engineering',
+          name: 'Інженерний',
+          forWhat: 'Функційні деталі, кріплення, елементи під навантаження.',
+          traits: 'Вища міцність і жорсткість порівняно зі стандартним.',
+          image: '/mock/detali/resin-wave.png',
+          imageAlt: 'Інженерна фотополімерна смола',
+        },
+      ],
+      layerColumns: [
+        { key: '100', label: '100 мкм', hint: 'Швидше' },
+        { key: '50', label: '50 мкм', hint: 'Оптимально', highlight: true },
+        { key: '25', label: '25 мкм', hint: 'Найтонше' },
+      ],
+      priceRows: [
+        {
+          material: 'Стандартний',
+          prices: {
+            '100': standardLabel,
+            '50': standardLabel,
+            '25': standardLabel,
+          },
+        },
+        {
+          material: 'Інженерний',
+          prices: {
+            '100': engineeringLabel,
+            '50': engineeringLabel,
+            '25': engineeringLabel,
+          },
+        },
+      ],
+    },
+  ]
+}
+
+/** @deprecated Prefer buildPrintTechnologies(pricing) */
+export const PRINT_TECHNOLOGIES: PrintTechnology[] = buildPrintTechnologies()
+
+export function availablePrintTechnologies(
+  pricing?: PartsPricingInput,
+): PrintTechnology[] {
+  return buildPrintTechnologies(pricing).filter((tech) => tech.available)
+}
+
+export function formatPartsMinOrder(minOrderUah: number = PARTS_MIN_ORDER_UAH) {
   return new Intl.NumberFormat('uk-UA', {
     style: 'currency',
     currency: 'UAH',
     maximumFractionDigits: 0,
-  }).format(PARTS_MIN_ORDER_UAH)
+  }).format(minOrderUah)
+}
+
+export {
+  PRINT_SELL_RATE_LABEL,
+  PRINT_SELL_RATE_ENGINEERING_LABEL,
 }

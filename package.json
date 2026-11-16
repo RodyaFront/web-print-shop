@@ -8,7 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "check:turntable": "npx --yes tsx shared/turntable-scrub.selfcheck.ts"
+    "check:turntable": "npx --yes tsx shared/turntable-scrub.selfcheck.ts",
+    "check:print-costing": "npx --yes tsx shared/print-costing.selfcheck.ts"
   },
   "dependencies": {
     "@nuxt/icon": "^2.6.2",

@@ -41,7 +41,7 @@ useSeoMeta({
       </section>
 
       <div class="row">
-        <NuxtLink class="btn btn-secondary" to="/">
+        <NuxtLink class="btn btn-secondary" to="/figurky">
           На головну
         </NuxtLink>
       </div>

@@ -4,7 +4,13 @@ export const SHOP_TAGLINE = '3D-друк і ручне фарбування'
 export const ORDER_TYPES = ['figurine', 'parts', 'ready'] as const
 export type OrderType = (typeof ORDER_TYPES)[number]
 
-export const ORDER_STATUSES = ['new', 'in_progress', 'done'] as const
+export const ORDER_STATUSES = [
+  'new',
+  'in_progress',
+  'shipped',
+  'done',
+  'cancelled',
+] as const
 export type OrderStatus = (typeof ORDER_STATUSES)[number]
 
 export const ORDER_TYPE_LABELS: Record<OrderType, string> = {
@@ -22,7 +28,9 @@ export type ReadyOrderItem = {
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   new: 'Нова',
   in_progress: 'В роботі',
+  shipped: 'Відправлена',
   done: 'Виконана',
+  cancelled: 'Скасована',
 }
 
 export const PAYMENT_METHODS = ['cod', 'card'] as const

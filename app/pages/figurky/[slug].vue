@@ -4,17 +4,18 @@ import {
   figurinePath,
   figurineSpecs,
   formatPriceUah,
-  getFigurineByParam,
 } from '../../../shared/figurky-catalog'
 import { uniqueSrcs } from '../../../shared/image-srcs'
 
 const { shopName } = useShop()
 const route = useRoute()
 const siteOrigin = useSiteOrigin()
+const { byParam } = useCatalog()
+await useFetch('/api/figurky', { key: 'figurky-catalog' })
 const { has, add } = useCart()
 
 const param = computed(() => String(route.params.slug || ''))
-const product = computed(() => getFigurineByParam(param.value))
+const product = computed(() => byParam(param.value))
 
 if (!product.value) {
   throw createError({
@@ -141,7 +142,7 @@ useHead(() => {
 })
 
 watch(param, (value) => {
-  const next = getFigurineByParam(value)
+  const next = byParam(value)
   if (!next) {
     throw createError({
       statusCode: 404,

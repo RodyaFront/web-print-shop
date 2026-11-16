@@ -1,5 +1,3 @@
-import { FIGURKY_CATALOG } from '../../shared/figurky-catalog'
-
 function escapeXml(value: string) {
   return value
     .replace(/&/g, '&amp;')
@@ -9,11 +7,13 @@ function escapeXml(value: string) {
     .replace(/'/g, '&apos;')
 }
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const requestUrl = getRequestURL(event)
   const configured = String(config.public.siteUrl || '').trim().replace(/\/$/, '')
   const origin = configured || requestUrl.origin
+
+  const catalog = await listFigurines()
 
   const urls = [
     { loc: `${origin}/figurky`, changefreq: 'weekly', priority: '0.9' },
@@ -21,7 +21,7 @@ export default defineEventHandler((event) => {
     { loc: `${origin}/figurky/zamovyty`, changefreq: 'monthly', priority: '0.6' },
     { loc: `${origin}/detali/zamovyty`, changefreq: 'monthly', priority: '0.6' },
     { loc: `${origin}/delivery`, changefreq: 'monthly', priority: '0.5' },
-    ...FIGURKY_CATALOG.map((product) => ({
+    ...catalog.map((product) => ({
       loc: `${origin}/figurky/${product.slug}`,
       changefreq: 'weekly',
       priority: '0.8',

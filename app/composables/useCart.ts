@@ -1,28 +1,15 @@
-import { getFigurineById, type FigurineProduct } from '../../shared/figurky-catalog'
+import type { FigurineProduct } from '../../shared/figurky-catalog'
 
 const CART_COOKIE = 'figulyarnya-cart'
 const CART_MAX_AGE = 60 * 60 * 24 * 30
-
-function sanitizeIds(raw: unknown): string[] {
-  if (!Array.isArray(raw)) return []
-  const seen = new Set<string>()
-  const ids: string[] = []
-  for (const value of raw) {
-    if (typeof value !== 'string' || !value) continue
-    if (seen.has(value)) continue
-    const product = getFigurineById(value)
-    if (!product || product.status !== 'in_stock') continue
-    seen.add(value)
-    ids.push(value)
-  }
-  return ids
-}
 
 /**
  * Client cart for ready-made catalog figurines (unique pieces, qty = 1).
  * Persist via cookie so SSR and client share the same ids.
  */
 export function useCart() {
+  const { byId, catalog } = useCatalog()
+
   const idsCookie = useCookie<string[]>(CART_COOKIE, {
     default: () => [],
     maxAge: CART_MAX_AGE,
@@ -31,11 +18,26 @@ export function useCart() {
     watch: true,
   })
 
+  function sanitizeIds(raw: unknown): string[] {
+    if (!Array.isArray(raw)) return []
+    const seen = new Set<string>()
+    const ids: string[] = []
+    for (const value of raw) {
+      if (typeof value !== 'string' || !value) continue
+      if (seen.has(value)) continue
+      const product = byId(value)
+      if (!product || product.status !== 'in_stock') continue
+      seen.add(value)
+      ids.push(value)
+    }
+    return ids
+  }
+
   const ids = computed(() => sanitizeIds(idsCookie.value))
 
   const items = computed<FigurineProduct[]>(() =>
     ids.value
-      .map((id) => getFigurineById(id))
+      .map((id) => byId(id))
       .filter((item): item is FigurineProduct => Boolean(item)),
   )
 
@@ -54,7 +56,7 @@ export function useCart() {
   }
 
   function add(id: string) {
-    const product = getFigurineById(id)
+    const product = byId(id)
     if (!product || product.status !== 'in_stock') return false
     if (has(id)) return true
     persist([...ids.value, id])
@@ -68,6 +70,13 @@ export function useCart() {
   function clear() {
     persist([])
   }
+
+  watch(catalog, () => {
+    const next = sanitizeIds(idsCookie.value)
+    if (next.join('|') !== (idsCookie.value ?? []).join('|')) {
+      idsCookie.value = next
+    }
+  })
 
   return {
     ids,
