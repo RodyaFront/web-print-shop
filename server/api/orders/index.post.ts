@@ -14,6 +14,7 @@ import {
 } from '../../../shared/shop'
 import { reserveReadyFigurines, restoreFigurinesInStock } from '../../utils/catalog'
 import { isOrderType, createOrder } from '../../utils/storage'
+import { notifyNewOrder } from '../../utils/telegram'
 
 function asText(value: unknown) {
   return String(value ?? '').trim()
@@ -223,6 +224,8 @@ export default defineEventHandler(async (event) => {
       paymentMethod,
       uploads,
     })
+
+    await notifyNewOrder(order)
 
     return {
       id: order.id,

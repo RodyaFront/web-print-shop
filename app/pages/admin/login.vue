@@ -5,6 +5,7 @@ definePageMeta({
 
 const { shopName } = useShop()
 const password = ref('')
+const showPassword = ref(false)
 const error = ref('')
 const submitting = ref(false)
 
@@ -39,14 +40,29 @@ async function onSubmit(event: Event) {
       <div v-if="error" class="error-box" role="alert">{{ error }}</div>
       <div class="field">
         <label for="password">Пароль</label>
-        <input
-          id="password"
-          v-model="password"
-          type="password"
-          name="password"
-          required
-          autocomplete="current-password"
-        >
+        <div class="field-password">
+          <input
+            id="password"
+            v-model="password"
+            :type="showPassword ? 'text' : 'password'"
+            name="password"
+            required
+            autocomplete="current-password"
+          >
+          <button
+            type="button"
+            class="btn-icon btn-icon--dense field-password__toggle"
+            :aria-label="showPassword ? 'Приховати пароль' : 'Показати пароль'"
+            :aria-pressed="showPassword"
+            @click="showPassword = !showPassword"
+          >
+            <Icon
+              :name="showPassword ? 'ph:eye-slash' : 'ph:eye'"
+              class="icon-sm"
+              aria-hidden="true"
+            />
+          </button>
+        </div>
       </div>
       <button class="btn btn-primary" type="submit" :disabled="submitting">
         {{ submitting ? 'Перевіряємо…' : 'Увійти' }}

@@ -42,6 +42,10 @@ export default defineNuxtConfig({
     meestLogin: '',
     meestPassword: '',
     ukrposhtaBearer: '',
+    /** Telegram Bot API token for new-order notifications (optional). */
+    telegramBotToken: '',
+    /** Destination chat/group/channel id for bot notifications (optional). */
+    telegramChatId: '',
     public: {
       /** Production origin for canonical, sitemap, JSON-LD. Example: https://figulyarnya.ua */
       siteUrl: '',
